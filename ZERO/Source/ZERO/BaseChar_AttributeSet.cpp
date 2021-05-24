@@ -18,10 +18,7 @@ void UBaseChar_AttributeSet::PreAttributeChange(const FGameplayAttribute & Attri
 {
 	Super::PreAttributeChange(Attribute, NewValue);
 
-	if (Attribute == GetMaxHealthAttribute())
-	{
-		AdjustAttributeForMaxChange(Health, MaxHealth, NewValue, GetHealthAttribute());
-	}
+	
 }
 
 void UBaseChar_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData & Data)
@@ -116,13 +113,32 @@ void UBaseChar_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModC
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		// Handle other health changes such as from healing or direct modifiers
-		// First clamp it
-		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
+		// First clamp it\
 
+		//FString PrintString = FString::SanitizeFloat(DeltaValue);
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, *PrintString);
+		if (DeltaValue != 0)
+		{
+			SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
+			
+			FString PrintString = FString::SanitizeFloat(GetHealth());
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, *PrintString);
+			if (TargetCharacter)
+			{
+
+				// Call for all health changes
+				//TargetCharacter->HandleHealthChanged(DeltaValue, SourceTags);
+			}
+
+			
+		}
+
+	}
+	if (Data.EvaluatedData.Attribute == GetSpeedAttribute())
+	{
 		if (TargetCharacter)
 		{
-			// Call for all health changes
-			//TargetCharacter->HandleHealthChanged(DeltaValue, SourceTags);
+			TargetCharacter->HandleSpeedChanged(DeltaValue, SourceTags);
 		}
 	}
 }
@@ -134,7 +150,7 @@ void UBaseChar_AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseChar_AttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseChar_AttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseChar_AttributeSet, Stamina, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UBaseChar_AttributeSet, AttackPower, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseChar_AttributeSet, Speed, COND_None, REPNOTIFY_Always);
 }
 
 void UBaseChar_AttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
@@ -152,9 +168,9 @@ void UBaseChar_AttributeSet::OnRep_Stamina(const FGameplayAttributeData& OldStam
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseChar_AttributeSet, Stamina, OldStamina);
 }
 
-void UBaseChar_AttributeSet::OnRep_AttackPower(const FGameplayAttributeData& OldAttackPower)
+void UBaseChar_AttributeSet::OnRep_Speed(const FGameplayAttributeData& OldSpeed)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseChar_AttributeSet, AttackPower, OldAttackPower);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseChar_AttributeSet, Speed, OldSpeed);
 }
 
 void UBaseChar_AttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData & AffectedAttribute, const FGameplayAttributeData & MaxAttribute, float NewMaxValue, const FGameplayAttribute & AffectedAttributeProperty)

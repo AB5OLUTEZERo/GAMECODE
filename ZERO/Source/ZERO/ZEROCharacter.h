@@ -51,6 +51,13 @@ public:
 	UFUNCTION()
 		void HandleHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
+	UFUNCTION()
+		void HandleSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
+	UFUNCTION()
+		void HandleDeath(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GAS")
 		TSubclassOf<class UGameplayEffect> DefaultGameplayEffect;
 

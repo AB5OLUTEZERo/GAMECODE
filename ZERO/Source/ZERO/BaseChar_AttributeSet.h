@@ -55,13 +55,13 @@ public:
 	UFUNCTION()
 		virtual void OnRep_Stamina(const FGameplayAttributeData& OldStamina);
 
-	UPROPERTY(BlueprintReadOnly, Category = "Attribute", ReplicatedUsing = OnRep_AttackPower)
-		FGameplayAttributeData AttackPower;
+	UPROPERTY(BlueprintReadOnly, Category = "Attribute", ReplicatedUsing = OnRep_Speed)
+		FGameplayAttributeData Speed;
 
-	ATTRIBUTE_ACCESSORS(UBaseChar_AttributeSet, AttackPower);
+	ATTRIBUTE_ACCESSORS(UBaseChar_AttributeSet, Speed);
 
 	UFUNCTION()
-		virtual void OnRep_AttackPower(const FGameplayAttributeData& OldAttackPower);
+		virtual void OnRep_Speed(const FGameplayAttributeData& OldSpeed);
 
 protected:
 	/** Helper function to proportionally adjust the value of an attribute when it's associated max attribute changes. (i.e. When MaxHealth increases, Health increases by an amount that maintains the same percentage as before) */

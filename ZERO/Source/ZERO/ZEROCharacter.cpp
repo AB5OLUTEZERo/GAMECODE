@@ -129,8 +129,34 @@ void AZEROCharacter::HandleHealthChanged(float DeltaValue, const FGameplayTagCon
 {
 	if (HasAuthority())
 	{
-		FString PrintString = FString::SanitizeFloat(DeltaValue);
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, *PrintString);
+		//FString PrintString = FString::SanitizeFloat(DeltaValue);
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, *PrintString);
+		
+		
+		 FString PrintString = FString::SanitizeFloat(AttributeSet->GetHealth());
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, *PrintString);
+
+		
+	}
+}
+
+void AZEROCharacter::HandleSpeedChanged(float DeltaValue, const FGameplayTagContainer & EventTags)
+{
+	if (HasAuthority())
+	{
+		
+		GetCharacterMovement()->MaxWalkSpeed = AttributeSet->GetSpeed();
+	}
+}
+
+void AZEROCharacter::HandleDeath(float DeltaValue, const FGameplayTagContainer & EventTags)
+{
+	if (HasAuthority())
+	{
+		if (DeltaValue != 0)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Black, "Dead");
+		}
 	}
 }
 
