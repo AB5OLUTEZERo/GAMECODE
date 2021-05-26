@@ -76,7 +76,7 @@ void UGA_Yatagarasu_SunSlash::EventReceived(FGameplayTag EventTag, FGameplayEven
 	if (ProjectileClass)
 	{
 		
-		FString MuzzleLocationName = "Muzzle_01";
+		FString MuzzleLocationName = "Muzzle_02";
 		FVector CameraLocation = Hero->GetMesh()->GetSocketLocation(FName(*MuzzleLocationName));;
 		FRotator CameraRotation = Hero->GetActorRotation();
 	

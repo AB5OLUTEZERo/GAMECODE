@@ -161,9 +161,10 @@ void UGA_BaseProjectileAndWaitForEvent::HitEventReceived(FGameplayEventData Even
 
 		FGameplayTag TagImpact = FGameplayTag::RequestGameplayTag(FName(GCTagForImpact));
 
-		Villan->GetAbilitySystemComponent()->AddGameplayCue(TagImpact, ImpactParams);
-		ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, EventData.TargetData, DamageGameplayEffect, 1);
-
+		
+			Villan->GetAbilitySystemComponent()->AddGameplayCue(TagImpact, ImpactParams);
+			ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, EventData.TargetData, DamageGameplayEffect, 1);
+		
 		
 	}
 }
