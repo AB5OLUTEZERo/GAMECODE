@@ -5,5 +5,5 @@
 
 UBaseChar_BaseGameplayAbility::UBaseChar_BaseGameplayAbility()
 {
-
+	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Player.Debuff.Stun")));
 }

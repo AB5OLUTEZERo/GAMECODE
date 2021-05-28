@@ -37,6 +37,9 @@ public:
 		FVector MuzzleOffset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		float MuzzleOffsetDistance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		FString MuzzleLocationName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
@@ -45,7 +48,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		FString GCTagForImpact;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Homing)
+		bool bIsAHomingProjectile;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Homing)
+		float HomingAccuracy;
+
+	AZEROCharacter* FindClosestTargetToHero();
 
 	UAT_PlayMontageAndWaitForEvent* Task;
 

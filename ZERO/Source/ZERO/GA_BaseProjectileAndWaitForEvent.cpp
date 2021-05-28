@@ -17,6 +17,9 @@ UGA_BaseProjectileAndWaitForEvent::UGA_BaseProjectileAndWaitForEvent()
 
 
 	MuzzleLocationName = "Muzzle";
+	MuzzleOffsetDistance = 25;
+
+	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Player.Debuff.Stun")));
 }
 void UGA_BaseProjectileAndWaitForEvent::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo * ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData * TriggerEventData)
 {
@@ -50,6 +53,32 @@ void UGA_BaseProjectileAndWaitForEvent::EndAbility(const FGameplayAbilitySpecHan
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
+AZEROCharacter * UGA_BaseProjectileAndWaitForEvent::FindClosestTargetToHero()
+{
+	TArray<AActor*> _TempArryActors;
+	float ClosestDis = 1000000000;
+	AZEROCharacter* Target = nullptr;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AZEROCharacter::StaticClass(), _TempArryActors);
+	for (int32 i = 0; i < _TempArryActors.Num(); i++)
+	{
+		if (_TempArryActors[i] != Hero)
+		{
+			float dist = FVector::Dist(Hero->GetActorLocation(), _TempArryActors[i]->GetActorLocation());
+			if (dist < ClosestDis)
+			{
+				ClosestDis = dist;
+				Target = Cast<AZEROCharacter>(_TempArryActors[i]);
+			}
+		}
+	}
+	if (Target)
+	{
+		return Target;
+	}
+	return nullptr;
+}
+
 void UGA_BaseProjectileAndWaitForEvent::OnCompletedOrOnCancelled(FGameplayTag EventTag, FGameplayEventData EventData)
 {
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
@@ -69,12 +98,14 @@ void UGA_BaseProjectileAndWaitForEvent::EventReceived(FGameplayTag EventTag, FGa
 		MuzzleOffset.Set(100.0f, 0.0f, 0.0f);
 
 		// Transform MuzzleOffset from camera space to world space.
-		FVector MuzzleLocation = CameraLocation + (Hero->GetActorForwardVector() * 25);
+		FVector MuzzleLocation = CameraLocation + (Hero->GetActorForwardVector() * MuzzleOffsetDistance);
 
 		// Skew the aim to be slightly upwards.
 		FRotator MuzzleRotation = CameraRotation;
 		//MuzzleRotation.Pitch += 10.0f;
 		//Hero->IncrementComboCount();
+
+		
 
 		UWorld* World = GetWorld();
 		if (World)
@@ -108,6 +139,15 @@ void UGA_BaseProjectileAndWaitForEvent::EventReceived(FGameplayTag EventTag, FGa
 
 						FVector LaunchDirection = MuzzleRotation.Vector();
 						Projectile->FireInDirection(LaunchDirection);
+
+						if (bIsAHomingProjectile == true)
+						{
+							AZEROCharacter* HomingTar = FindClosestTargetToHero();
+							if (HomingTar)
+							{
+								Projectile->HomingTargetSet(HomingTar,HomingAccuracy);
+							}
+						}
 
 						Projectile->OnDestroyed.AddDynamic(this, &UGA_BaseProjectileAndWaitForEvent::ProjectileDestroyed);
 						FGameplayTag TagX = FGameplayTag::RequestGameplayTag(FName("Weapon.Projectile.Hit"));
@@ -161,7 +201,7 @@ void UGA_BaseProjectileAndWaitForEvent::HitEventReceived(FGameplayEventData Even
 
 		FGameplayTag TagImpact = FGameplayTag::RequestGameplayTag(FName(GCTagForImpact));
 
-		
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "Effect");
 			Villan->GetAbilitySystemComponent()->AddGameplayCue(TagImpact, ImpactParams);
 			ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, EventData.TargetData, DamageGameplayEffect, 1);
 		

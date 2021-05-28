@@ -67,10 +67,11 @@ void AGAS_HitActor::OnHit(UPrimitiveComponent * HitComponent, AActor * OtherActo
 		AZEROCharacter* Villan = Cast<AZEROCharacter>(OtherActor);
 		if (Villan)
 		{
+			//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "REP.Hit");
 			FGameplayEventData Pay;
-			Pay.Instigator = GetOwner()->GetInstigator();
-			Pay.Target = OtherActor;
-			FGameplayAbilityTargetDataHandle TDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(OtherActor);
+			Pay.Instigator =Hero;
+			Pay.Target = Villan;
+			FGameplayAbilityTargetDataHandle TDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(Villan);
 			//FGameplayAbilityTargetData TData;
 			Pay.TargetData = TDataHandle;
 
@@ -90,9 +91,19 @@ void AGAS_HitActor::OnHit(UPrimitiveComponent * HitComponent, AActor * OtherActo
 	else
 	{
 		Destroy();
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, "Hit Owner or self");
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, "Hit Owner or self");
 	}
 
+}
+
+void AGAS_HitActor::HomingTargetSet(AZEROCharacter * Target, float HomingAccuracy)
+{
+	if (Target)
+	{
+		ProjectileMovementComponent->HomingTargetComponent = Target->GetRootComponent();
+		ProjectileMovementComponent->bIsHomingProjectile = true;
+		ProjectileMovementComponent->HomingAccelerationMagnitude = HomingAccuracy;
+	}
 }
 
 // Called when the game starts or when spawned

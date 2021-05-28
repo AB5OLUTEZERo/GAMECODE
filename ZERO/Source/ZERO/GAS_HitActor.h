@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "GAS_HitActor.generated.h"
 
+
+
 UCLASS()
 class ZERO_API AGAS_HitActor : public AActor
 {
@@ -31,6 +33,8 @@ public:
 	UFUNCTION()
 		void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 
+
+	void HomingTargetSet(class AZEROCharacter* Target, float HomingAccuracy);
 
 
 protected:

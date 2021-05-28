@@ -33,12 +33,12 @@ void UGA_BaseChar_MeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle 
 
 	Hero = Cast<	AZEROCharacter>(GetAvatarActorFromActorInfo());
 
-	DrawDebugSphere(GetWorld(), Hero->GetActorLocation(), 32, 32, FColor::Blue, false, 20);
+	
 
 	if (Hero)
 	{
-		//int32 StartSectionCount = Hero->ComboCount;
-		FString MeleeStartSection = "Melee";
+		int32 StartSectionCount = Hero->ComboCount;
+		FString MeleeStartSection = "Melee_"+ FString::FromInt(StartSectionCount);
 		FName MontageSectionName = FName(*MeleeStartSection);
 		if (GEngine)
 		{
@@ -62,24 +62,22 @@ void UGA_BaseChar_MeleeAttack::OnCancelled(FGameplayTag EventTag, FGameplayEvent
 
 void UGA_BaseChar_MeleeAttack::OnCompleted(FGameplayTag EventTag, FGameplayEventData EventData)
 {
+	Hero->IncrementComboCount();
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
 void UGA_BaseChar_MeleeAttack::EventReceived(FGameplayTag EventTag, FGameplayEventData EventData)
 {
-	AZEROCharacter* Hero1 = Cast<	AZEROCharacter>(GetAvatarActorFromActorInfo());
-	// Montage told us to end the ability before the montage finished playing.
-	// Montage was set to continue playing animation even after ability ends so this is okay.
-	const AActor* Villan = EventData.Target;
-	const AZEROCharacter* Hero2 = Cast<	AZEROCharacter>(Villan);
+	
+	
+	const AZEROCharacter* Hero2 = Cast<	AZEROCharacter>(EventData.Target);
 
-	//DrawDebugSphere(GetWorld(), Hero->GetActorLocation(), 32, 32, FColor::Blue, false, 20);
-	Hero1->LaunchCharacter(FVector(0, 0, 1000), true, true);
+	DrawDebugSphere(GetWorld(), Hero->GetActorLocation(), 32, 32, FColor::Blue, false, 20);
 	FGameplayAbilityTargetDataHandle Handle;
 	Handle.Append(EventData.TargetData);
 	ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, EventData.TargetData, DamageGameplayEffect, 1);
 
 	//ApplyCost(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo);
-	//Hero->IncrementComboCount();
+	Hero->IncrementComboCount();
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }

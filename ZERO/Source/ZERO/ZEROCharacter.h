@@ -66,7 +66,18 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GAS")
 		TArray<TSubclassOf<class UBaseChar_BaseGameplayAbility>> DefaultAbilities;
 
+	UFUNCTION()
+		virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
+
+	UPROPERTY(BlueprintReadOnly, Category = "Combo")
+		int ComboCount;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Combo")
+		int MaxComboCount;
+
+	UFUNCTION()
+		void IncrementComboCount();
 protected:
 
 	/** Resets HMD orientation in VR. */

@@ -52,13 +52,20 @@ AZEROCharacter::AZEROCharacter()
 	//GAS Components
 	AbilitySystemComp = CreateDefaultSubobject<UBaseChar_AbilitySystemComponent>(TEXT("AbilitySystemComp"));
 	AbilitySystemComp->SetIsReplicated(true);
-	AbilitySystemComp->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+	AbilitySystemComp->SetReplicationMode(EGameplayEffectReplicationMode::Full);
 
 	AttributeSet = CreateDefaultSubobject<UBaseChar_AttributeSet>(TEXT("AttributeSet"));
 
 
+	AbilitySystemComp->RegisterGameplayTagEvent(FGameplayTag::RequestGameplayTag(FName("Player.Debuff.Stun")), EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AZEROCharacter::StunTagChanged);
+
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+
+	ComboCount = 1;
+	MaxComboCount = 3;
 }
 
 UAbilitySystemComponent * AZEROCharacter::GetAbilitySystemComponent() const
@@ -196,6 +203,28 @@ void AZEROCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	}
 }
 
+
+void AZEROCharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Cyan, "StunChange");
+	if (NewCount > 0)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 0;
+	}
+	else
+	{
+		GetCharacterMovement()->MaxWalkSpeed = AttributeSet->GetSpeed();
+	}
+}
+
+void AZEROCharacter::IncrementComboCount()
+{
+	ComboCount++;
+	if (ComboCount == MaxComboCount)
+	{
+		ComboCount = 1;
+	}
+}
 
 void AZEROCharacter::OnResetVR()
 {
