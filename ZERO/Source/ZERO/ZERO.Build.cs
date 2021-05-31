@@ -17,7 +17,8 @@ public class ZERO : ModuleRules
             "GameplayTasks",
             "Paper2D",
             "AIModule",
-            "NavigationSystem"
+            "NavigationSystem",
+            "UMG"
         });
     }
 }

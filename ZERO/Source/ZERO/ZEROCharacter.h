@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include <GameplayEffectTypes.h>
+#include"ZERO.h"
 #include "ZEROCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -78,6 +79,9 @@ public:
 
 	UFUNCTION()
 		void IncrementComboCount();
+
+	ETeamID TeamID;
+	
 protected:
 
 	/** Resets HMD orientation in VR. */

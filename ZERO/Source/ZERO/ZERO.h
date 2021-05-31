@@ -26,3 +26,11 @@ enum class EGASAbilityInputID : uint8
 	Ability_2,
 	Ultimate
 };
+
+UENUM(BlueprintType)
+enum class ETeamID : uint8
+{
+	None,
+	TeamA,
+	TeamB
+};

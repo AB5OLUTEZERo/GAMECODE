@@ -66,6 +66,7 @@ AZEROCharacter::AZEROCharacter()
 
 	ComboCount = 1;
 	MaxComboCount = 3;
+	TeamID = ETeamID::None;
 }
 
 UAbilitySystemComponent * AZEROCharacter::GetAbilitySystemComponent() const
