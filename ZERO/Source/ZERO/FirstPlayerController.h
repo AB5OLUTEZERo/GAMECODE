@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include"ZERO.h"
 #include "FirstPlayerController.generated.h"
 
 /**
@@ -20,7 +21,8 @@ public:
 	AFirstPlayerController();
 
 
-	
+	UFUNCTION(Reliable,Server,BlueprintCallable,Category="TeamSelection")
+		void TeamSelected(ETeamID TeamID);
 	
 protected:
 	// Called when the game starts or when spawned
@@ -29,6 +31,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 		TSubclassOf<UUserWidget> MenuWidget;
+
 
 	
 

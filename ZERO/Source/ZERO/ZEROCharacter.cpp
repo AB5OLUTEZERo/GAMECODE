@@ -12,6 +12,7 @@
 #include"BaseChar_AbilitySystemComponent.h"
 #include"BaseChar_AttributeSet.h"
 #include"BaseChar_BaseGameplayAbility.h"
+#include "Net/UnrealNetwork.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AZEROCharacter
@@ -204,6 +205,14 @@ void AZEROCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	}
 }
 
+void AZEROCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AZEROCharacter, TeamID);
+	
+}
+
 
 void AZEROCharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
@@ -225,6 +234,11 @@ void AZEROCharacter::IncrementComboCount()
 	{
 		ComboCount = 1;
 	}
+}
+
+void AZEROCharacter::SetTeamBeforeSpawn(ETeamID TID)
+{
+	TeamID = TID;
 }
 
 void AZEROCharacter::OnResetVR()

@@ -80,7 +80,12 @@ public:
 	UFUNCTION()
 		void IncrementComboCount();
 
+	UPROPERTY(replicated)
 	ETeamID TeamID;
+
+
+	UFUNCTION()
+		void SetTeamBeforeSpawn(ETeamID TID);
 	
 protected:
 
@@ -116,6 +121,7 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

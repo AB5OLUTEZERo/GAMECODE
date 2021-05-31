@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameState.h"
-#include "FirstGameState.generated.h"
+#include "GameFramework/GameStateBase.h"
+#include "FirstGameStateBase.generated.h"
 
 /**
  * 
@@ -12,20 +12,19 @@
 
 class AZEROCharacter;
 UCLASS()
-class ZERO_API AFirstGameState : public AGameState
+class ZERO_API AFirstGameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
 	
 
 public:
-	AFirstGameState();
+	AFirstGameStateBase();
 
 	UPROPERTY(replicated)
-	TArray<AZEROCharacter*> Players;
+		TArray<AZEROCharacter*> Players;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	
 
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

@@ -6,12 +6,21 @@
 #include"LoadCameraPawn.h"
 #include "Components/Widget.h"
 #include "Blueprint/UserWidget.h"
+#include"FirstGameMode.h"
 
 
 
 AFirstPlayerController::AFirstPlayerController()
 {
 	
+}
+void AFirstPlayerController::TeamSelected_Implementation(ETeamID TeamID)
+{
+	AFirstGameMode* MyGameMode = Cast<AFirstGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (MyGameMode)
+	{
+		MyGameMode->RequestSpawn(TeamID, this);
+	}
 }
 void AFirstPlayerController::BeginPlay()
 {
