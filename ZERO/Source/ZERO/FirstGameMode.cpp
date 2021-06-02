@@ -5,6 +5,8 @@
 #include"FirstPlayerController.h"
 #include"FirstGameState.h"
 #include "ZEROCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include"FirstGameInstance.h"
 
 AFirstGameMode::AFirstGameMode()
 	
@@ -18,39 +20,35 @@ AFirstGameMode::AFirstGameMode()
 
 void AFirstGameMode::RequestSpawn(ETeamID TeamID, AFirstPlayerController * ControllerRef)
 {
+	
+}
+
+void AFirstGameMode::RequestCharacterSpawn(TSubclassOf<AZEROCharacter> PlayerClass, ETeamID TeamID, AFirstPlayerController * ControllerRef)
+{
 	if (PlayerClass)
 	{
-		UWorld* MyWorld = GetWorld();
-
+		
+		FTransform SpawnTransform;
 		if (TeamID == ETeamID::TeamA)
 		{
-			FVector SpawnLocation = FVector(-912.002502, -338.000000, 222.001526);
-
-			FTransform SpawnTransform;
-			SpawnTransform.SetLocation(SpawnLocation);
-			SpawnTransform.SetScale3D(FVector(1, 1, 1));
-			AZEROCharacter* Player = MyWorld->SpawnActorDeferred<AZEROCharacter>(PlayerClass, SpawnTransform);
-			Player->SetTeamBeforeSpawn(TeamID);
-			Player->FinishSpawning(SpawnTransform);
-			ControllerRef->Possess(Player);
-
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "A");
+			SpawnTransform.SetLocation(FVector(-912.002502, 924.000000, 222.001526));
 		}
 		else if (TeamID == ETeamID::TeamB)
 		{
-			FVector SpawnLocation = FVector(-912.002502,  924.000000, 222.001526);
-
-			FTransform SpawnTransform;
-			SpawnTransform.SetLocation(SpawnLocation);
-			SpawnTransform.SetScale3D(FVector(1, 1, 1));
-			AZEROCharacter* Player = MyWorld->SpawnActorDeferred<AZEROCharacter>(PlayerClass, SpawnTransform);
-			Player->SetTeamBeforeSpawn(TeamID);
-			Player->FinishSpawning(SpawnTransform);
-			ControllerRef->Possess(Player);
+			SpawnTransform.SetLocation(FVector(-912.002502, -1301.000000, 222.001526));
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "B");
 		}
 		else
 		{
-
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "RepFire");
 		}
+		SpawnTransform.SetScale3D(FVector(1, 1, 1));
+		AZEROCharacter* MyPlayer = GetWorld()->SpawnActorDeferred<AZEROCharacter>(PlayerClass, SpawnTransform);
+		MyPlayer->SetTeamBeforeSpawn(TeamID);
+		MyPlayer->FinishSpawning(SpawnTransform);
+
+		ControllerRef->Possess(MyPlayer);
 	}
 }
 
@@ -58,5 +56,21 @@ void AFirstGameMode::StartPlay()
 {
 	
 	Super::StartPlay();
+	UFirstGameInstance* MyGameInstance = Cast<UFirstGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (MyGameInstance)
+	{
+		if (MyGameInstance->TeamID == ETeamID::None)
+		{
+			
+		}
+		else if(MyGameInstance->TeamID == ETeamID::TeamA)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "TeamA");
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "TeamB");
+		}
+	}
 	
 }

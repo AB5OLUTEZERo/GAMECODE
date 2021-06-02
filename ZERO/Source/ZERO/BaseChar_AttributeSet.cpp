@@ -23,124 +23,172 @@ void UBaseChar_AttributeSet::PreAttributeChange(const FGameplayAttribute & Attri
 
 void UBaseChar_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData & Data)
 {
-	Super::PostGameplayEffectExecute(Data);
+	
 
-	FGameplayEffectContextHandle Context = Data.EffectSpec.GetContext();
-	UAbilitySystemComponent* Source = Context.GetOriginalInstigatorAbilitySystemComponent();
-	const FGameplayTagContainer& SourceTags = *Data.EffectSpec.CapturedSourceTags.GetAggregatedTags();
+	//FGameplayEffectContextHandle Context = Data.EffectSpec.GetContext();
+	//UAbilitySystemComponent* Source = Context.GetOriginalInstigatorAbilitySystemComponent();
+	//const FGameplayTagContainer& SourceTags = *Data.EffectSpec.CapturedSourceTags.GetAggregatedTags();
 
-	// Compute the delta between old and new, if it is available
-	float DeltaValue = 0;
-	if (Data.EvaluatedData.ModifierOp == EGameplayModOp::Type::Additive)
-	{
-		// If this was additive, store the raw delta value to be passed along later
-		DeltaValue = Data.EvaluatedData.Magnitude;
-	}
+	//// Compute the delta between old and new, if it is available
+	//float DeltaValue = 0;
+	//if (Data.EvaluatedData.ModifierOp == EGameplayModOp::Type::Additive)
+	//{
+	//	// If this was additive, store the raw delta value to be passed along later
+	//	DeltaValue = Data.EvaluatedData.Magnitude;
+	//}
 
-	// Get the Target actor, which should be our owner
-	AActor* TargetActor = nullptr;
-	AController* TargetController = nullptr;
-	AZEROCharacter* TargetCharacter = nullptr;
+	//// Get the Target actor, which should be our owner
+	//AActor* TargetActor = nullptr;
+	//AController* TargetController = nullptr;
+	//AZEROCharacter* TargetCharacter = nullptr;
+	//if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
+	//{
+	//	TargetActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+	//	TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
+	//	TargetCharacter = Cast<AZEROCharacter>(TargetActor);
+	//}
+
+	///*	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
+	//	{
+	//		// Get the Source actor
+	//		AActor* SourceActor = nullptr;
+	//		AController* SourceController = nullptr;
+	//		ARPGCharacterBase* SourceCharacter = nullptr;
+	//		if (Source && Source->AbilityActorInfo.IsValid() && Source->AbilityActorInfo->AvatarActor.IsValid())
+	//		{
+	//			SourceActor = Source->AbilityActorInfo->AvatarActor.Get();
+	//			SourceController = Source->AbilityActorInfo->PlayerController.Get();
+	//			if (SourceController == nullptr && SourceActor != nullptr)
+	//			{
+	//				if (APawn* Pawn = Cast<APawn>(SourceActor))
+	//				{
+	//					SourceController = Pawn->GetController();
+	//				}
+	//			}
+
+	//			// Use the controller to find the source pawn
+	//			if (SourceController)
+	//			{
+	//				SourceCharacter = Cast<ARPGCharacterBase>(SourceController->GetPawn());
+	//			}
+	//			else
+	//			{
+	//				SourceCharacter = Cast<ARPGCharacterBase>(SourceActor);
+	//			}
+
+	//			// Set the causer actor based on context if it's set
+	//			if (Context.GetEffectCauser())
+	//			{
+	//				SourceActor = Context.GetEffectCauser();
+	//			}
+	//		}
+
+	//		// Try to extract a hit result
+	//		FHitResult HitResult;
+	//		if (Context.GetHitResult())
+	//		{
+	//			HitResult = *Context.GetHitResult();
+	//		}
+
+	//		// Store a local copy of the amount of damage done and clear the damage attribute
+	//		const float LocalDamageDone = GetDamage();
+	//		SetDamage(0.f);
+
+	//		if (LocalDamageDone > 0)
+	//		{
+	//			// Apply the health change and then clamp it
+	//			const float OldHealth = GetHealth();
+	//			SetHealth(FMath::Clamp(OldHealth - LocalDamageDone, 0.0f, GetMaxHealth()));
+
+	//			if (TargetCharacter)
+	//			{
+	//				// This is proper damage
+	//				TargetCharacter->HandleDamage(LocalDamageDone, HitResult, SourceTags, SourceCharacter, SourceActor);
+
+	//				// Call for all health changes
+	//				TargetCharacter->HandleHealthChanged(-LocalDamageDone, SourceTags);
+	//			}
+	//		}
+	//	}*/
+	//if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	//{
+	//	// Handle other health changes such as from healing or direct modifiers
+	//	// First clamp it\
+
+	//	//FString PrintString = FString::SanitizeFloat(DeltaValue);
+	//	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, *PrintString);
+	//	if (DeltaValue != 0)
+	//	{
+	//		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
+	//		
+	//		FString PrintString = FString::SanitizeFloat(GetHealth());
+	//		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, *PrintString);
+	//		if (TargetCharacter)
+	//		{
+
+	//			// Call for all health changes
+	//			//TargetCharacter->HandleHealthChanged(DeltaValue, SourceTags);
+	//		}
+
+	//		
+	//	}
+
+	//}
+	//if (Data.EvaluatedData.Attribute == GetSpeedAttribute())
+	//{
+	//	if (TargetCharacter)
+	//	{
+	//		TargetCharacter->HandleSpeedChanged(DeltaValue, SourceTags);
+	//	}
+	//}
+
+
+UAbilitySystemComponent* Source = Data.EffectSpec.GetContext().GetOriginalInstigatorAbilitySystemComponent();
+if (GetHealthAttribute() == Data.EvaluatedData.Attribute)
+{
+	// Get the Target actor
+	AActor* DamagedActor = nullptr;
+	AController* DamagedController = nullptr;
 	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
 	{
-		TargetActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
-		TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
-		TargetCharacter = Cast<AZEROCharacter>(TargetActor);
+		DamagedActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+		DamagedController = Data.Target.AbilityActorInfo->PlayerController.Get();
 	}
-
-	/*	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
-		{
-			// Get the Source actor
-			AActor* SourceActor = nullptr;
-			AController* SourceController = nullptr;
-			ARPGCharacterBase* SourceCharacter = nullptr;
-			if (Source && Source->AbilityActorInfo.IsValid() && Source->AbilityActorInfo->AvatarActor.IsValid())
-			{
-				SourceActor = Source->AbilityActorInfo->AvatarActor.Get();
-				SourceController = Source->AbilityActorInfo->PlayerController.Get();
-				if (SourceController == nullptr && SourceActor != nullptr)
-				{
-					if (APawn* Pawn = Cast<APawn>(SourceActor))
-					{
-						SourceController = Pawn->GetController();
-					}
-				}
-
-				// Use the controller to find the source pawn
-				if (SourceController)
-				{
-					SourceCharacter = Cast<ARPGCharacterBase>(SourceController->GetPawn());
-				}
-				else
-				{
-					SourceCharacter = Cast<ARPGCharacterBase>(SourceActor);
-				}
-
-				// Set the causer actor based on context if it's set
-				if (Context.GetEffectCauser())
-				{
-					SourceActor = Context.GetEffectCauser();
-				}
-			}
-
-			// Try to extract a hit result
-			FHitResult HitResult;
-			if (Context.GetHitResult())
-			{
-				HitResult = *Context.GetHitResult();
-			}
-
-			// Store a local copy of the amount of damage done and clear the damage attribute
-			const float LocalDamageDone = GetDamage();
-			SetDamage(0.f);
-
-			if (LocalDamageDone > 0)
-			{
-				// Apply the health change and then clamp it
-				const float OldHealth = GetHealth();
-				SetHealth(FMath::Clamp(OldHealth - LocalDamageDone, 0.0f, GetMaxHealth()));
-
-				if (TargetCharacter)
-				{
-					// This is proper damage
-					TargetCharacter->HandleDamage(LocalDamageDone, HitResult, SourceTags, SourceCharacter, SourceActor);
-
-					// Call for all health changes
-					TargetCharacter->HandleHealthChanged(-LocalDamageDone, SourceTags);
-				}
-			}
-		}*/
-	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	// Get the Source actor
+	AActor* AttackingActor = nullptr;
+	AController* AttackingController = nullptr;
+	AController* AttackingPlayerController = nullptr;
+	if (Source && Source->AbilityActorInfo.IsValid() && Source->AbilityActorInfo->AvatarActor.IsValid())
 	{
-		// Handle other health changes such as from healing or direct modifiers
-		// First clamp it\
-
-		//FString PrintString = FString::SanitizeFloat(DeltaValue);
-		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, *PrintString);
-		if (DeltaValue != 0)
+		AttackingActor = Source->AbilityActorInfo->AvatarActor.Get();
+		AttackingController = Source->AbilityActorInfo->PlayerController.Get();
+		AttackingPlayerController = Source->AbilityActorInfo->PlayerController.Get();
+		if (AttackingController == nullptr && AttackingActor != nullptr)
 		{
-			SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
-			
-			FString PrintString = FString::SanitizeFloat(GetHealth());
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, *PrintString);
-			if (TargetCharacter)
+			if (APawn* Pawn = Cast<APawn>(AttackingActor))
 			{
-
-				// Call for all health changes
-				//TargetCharacter->HandleHealthChanged(DeltaValue, SourceTags);
+				AttackingController = Pawn->GetController();
 			}
-
-			
-		}
-
-	}
-	if (Data.EvaluatedData.Attribute == GetSpeedAttribute())
-	{
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleSpeedChanged(DeltaValue, SourceTags);
 		}
 	}
+	// Clamp health
+	SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
+	if (GetHealth() <= 0)
+	{
+		// Handle death with GASCharacter. Note this is just one example of how this could be done.
+		if (AZEROCharacter* ZEROChar = Cast<AZEROCharacter>(DamagedActor))
+		{
+			// Construct a gameplay cue event for this death
+			FGameplayCueParameters Params(Data.EffectSpec.GetContext());
+			Params.RawMagnitude = Data.EvaluatedData.Magnitude;
+			Params.NormalizedMagnitude = FMath::Abs(Data.EvaluatedData.Magnitude / GetMaxHealth());
+			Params.AggregatedSourceTags = *Data.EffectSpec.CapturedSourceTags.GetAggregatedTags();
+			Params.AggregatedTargetTags = *Data.EffectSpec.CapturedTargetTags.GetAggregatedTags();
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "Dead");
+		}
+	}
+}
+
 }
 
 void UBaseChar_AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

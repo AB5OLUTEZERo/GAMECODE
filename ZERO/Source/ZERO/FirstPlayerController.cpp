@@ -7,7 +7,7 @@
 #include "Components/Widget.h"
 #include "Blueprint/UserWidget.h"
 #include"FirstGameMode.h"
-
+#include"FirstGameInstance.h"
 
 
 AFirstPlayerController::AFirstPlayerController()
@@ -16,11 +16,24 @@ AFirstPlayerController::AFirstPlayerController()
 }
 void AFirstPlayerController::TeamSelected_Implementation(ETeamID TeamID)
 {
+	TID = TeamID;
+}
+void AFirstPlayerController::CharacterSelected_Implementation(TSubclassOf<AZEROCharacter> PlayerClass)
+{
+
+	bShowMouseCursor = false;
 	AFirstGameMode* MyGameMode = Cast<AFirstGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (MyGameMode)
 	{
-		MyGameMode->RequestSpawn(TeamID, this);
+		
+			MyGameMode->RequestCharacterSpawn(PlayerClass, TID, this);
+		
 	}
+
+}
+void AFirstPlayerController::SetTheTPPController()
+{
+	
 }
 void AFirstPlayerController::BeginPlay()
 {
@@ -53,8 +66,8 @@ void AFirstPlayerController::BeginPlay()
 				InputModeData.SetWidgetToFocus(MyMenu->TakeWidget()); //Because UMG wraps Slate
 
 				// Step 3 set the mode for the player controller
-				SetInputMode(InputModeData);
-
+				//SetInputMode(InputModeData);
+			
 				// Step 4 enable cursor so you know what to click on:
 				bShowMouseCursor = true;
 			}

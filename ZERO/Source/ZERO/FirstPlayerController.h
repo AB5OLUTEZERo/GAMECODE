@@ -10,6 +10,7 @@
 /**
  * 
  */
+class AZEROCharacter;
 UCLASS()
 class ZERO_API AFirstPlayerController : public APlayerController
 {
@@ -21,8 +22,21 @@ public:
 	AFirstPlayerController();
 
 
-	UFUNCTION(Reliable,Server,BlueprintCallable,Category="TeamSelection")
+	UFUNCTION(Reliable, Server, BlueprintCallable,Category="TeamSelection")
 		void TeamSelected(ETeamID TeamID);
+
+	UFUNCTION(Reliable, Server, BlueprintCallable, Category = "CharacterSelection")
+		void CharacterSelected(TSubclassOf<AZEROCharacter> PlayerClass);
+
+
+	ETeamID TID;
+
+
+	UFUNCTION()
+		void SetTheTPPController();
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+		TSubclassOf<UUserWidget> CharSelectWidget;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -31,6 +45,8 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 		TSubclassOf<UUserWidget> MenuWidget;
+
+	
 
 
 	

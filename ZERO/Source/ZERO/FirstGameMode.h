@@ -24,11 +24,16 @@ public:
 
 	UFUNCTION()
 		void RequestSpawn(ETeamID TeamID, AFirstPlayerController* ControllerRef);
+
+
+	UFUNCTION()
+		void RequestCharacterSpawn(TSubclassOf<AZEROCharacter> PlayerClass, ETeamID TeamID, AFirstPlayerController* ControllerRef);
+
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void StartPlay() override;
 
 
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-		TSubclassOf<AZEROCharacter> PlayerClass;
+	
 };

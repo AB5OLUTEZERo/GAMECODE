@@ -40,10 +40,7 @@ void UGA_BaseChar_MeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle 
 		int32 StartSectionCount = Hero->ComboCount;
 		FString MeleeStartSection = "Melee_"+ FString::FromInt(StartSectionCount);
 		FName MontageSectionName = FName(*MeleeStartSection);
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, MeleeStartSection);
-		}
+		
 		UAT_PlayMontageAndWaitForEvent* Task = UAT_PlayMontageAndWaitForEvent::PlayMontageAndWaitForEvent(this, NAME_None, MontageToPlay, FGameplayTagContainer(), 1.0f, MontageSectionName, false, 1.0f);
 		Task->OnBlendOut.AddDynamic(this, &UGA_BaseChar_MeleeAttack::OnCompleted);
 		Task->OnCompleted.AddDynamic(this, &UGA_BaseChar_MeleeAttack::OnCompleted);
