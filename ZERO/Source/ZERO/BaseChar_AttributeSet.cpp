@@ -9,228 +9,122 @@
 #include"ZEROCharacter.h"
 
 
-
 UBaseChar_AttributeSet::UBaseChar_AttributeSet()
 {
-
+	MaximumHealth = 0.0f;
+	CurrentHealth = 0.0f;
+	HealthRegeneration = 0.0f;
 }
 void UBaseChar_AttributeSet::PreAttributeChange(const FGameplayAttribute & Attribute, float & NewValue)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
 
-	
+	if (Attribute == GetMaximumHealthAttribute())
+	{
+		AdjustAttributeForMaxChange(CurrentHealth, MaximumHealth, NewValue, GetCurrentHealthAttribute());
+	}
 }
 
 void UBaseChar_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData & Data)
 {
-	
+	Super::PostGameplayEffectExecute(Data);
 
-	//FGameplayEffectContextHandle Context = Data.EffectSpec.GetContext();
-	//UAbilitySystemComponent* Source = Context.GetOriginalInstigatorAbilitySystemComponent();
-	//const FGameplayTagContainer& SourceTags = *Data.EffectSpec.CapturedSourceTags.GetAggregatedTags();
-
-	//// Compute the delta between old and new, if it is available
-	//float DeltaValue = 0;
-	//if (Data.EvaluatedData.ModifierOp == EGameplayModOp::Type::Additive)
-	//{
-	//	// If this was additive, store the raw delta value to be passed along later
-	//	DeltaValue = Data.EvaluatedData.Magnitude;
-	//}
-
-	//// Get the Target actor, which should be our owner
-	//AActor* TargetActor = nullptr;
-	//AController* TargetController = nullptr;
-	//AZEROCharacter* TargetCharacter = nullptr;
-	//if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
-	//{
-	//	TargetActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
-	//	TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
-	//	TargetCharacter = Cast<AZEROCharacter>(TargetActor);
-	//}
-
-	///*	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
-	//	{
-	//		// Get the Source actor
-	//		AActor* SourceActor = nullptr;
-	//		AController* SourceController = nullptr;
-	//		ARPGCharacterBase* SourceCharacter = nullptr;
-	//		if (Source && Source->AbilityActorInfo.IsValid() && Source->AbilityActorInfo->AvatarActor.IsValid())
-	//		{
-	//			SourceActor = Source->AbilityActorInfo->AvatarActor.Get();
-	//			SourceController = Source->AbilityActorInfo->PlayerController.Get();
-	//			if (SourceController == nullptr && SourceActor != nullptr)
-	//			{
-	//				if (APawn* Pawn = Cast<APawn>(SourceActor))
-	//				{
-	//					SourceController = Pawn->GetController();
-	//				}
-	//			}
-
-	//			// Use the controller to find the source pawn
-	//			if (SourceController)
-	//			{
-	//				SourceCharacter = Cast<ARPGCharacterBase>(SourceController->GetPawn());
-	//			}
-	//			else
-	//			{
-	//				SourceCharacter = Cast<ARPGCharacterBase>(SourceActor);
-	//			}
-
-	//			// Set the causer actor based on context if it's set
-	//			if (Context.GetEffectCauser())
-	//			{
-	//				SourceActor = Context.GetEffectCauser();
-	//			}
-	//		}
-
-	//		// Try to extract a hit result
-	//		FHitResult HitResult;
-	//		if (Context.GetHitResult())
-	//		{
-	//			HitResult = *Context.GetHitResult();
-	//		}
-
-	//		// Store a local copy of the amount of damage done and clear the damage attribute
-	//		const float LocalDamageDone = GetDamage();
-	//		SetDamage(0.f);
-
-	//		if (LocalDamageDone > 0)
-	//		{
-	//			// Apply the health change and then clamp it
-	//			const float OldHealth = GetHealth();
-	//			SetHealth(FMath::Clamp(OldHealth - LocalDamageDone, 0.0f, GetMaxHealth()));
-
-	//			if (TargetCharacter)
-	//			{
-	//				// This is proper damage
-	//				TargetCharacter->HandleDamage(LocalDamageDone, HitResult, SourceTags, SourceCharacter, SourceActor);
-
-	//				// Call for all health changes
-	//				TargetCharacter->HandleHealthChanged(-LocalDamageDone, SourceTags);
-	//			}
-	//		}
-	//	}*/
-	//if (Data.EvaluatedData.Attribute == GetHealthAttribute())
-	//{
-	//	// Handle other health changes such as from healing or direct modifiers
-	//	// First clamp it\
-
-	//	//FString PrintString = FString::SanitizeFloat(DeltaValue);
-	//	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, *PrintString);
-	//	if (DeltaValue != 0)
-	//	{
-	//		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
-	//		
-	//		FString PrintString = FString::SanitizeFloat(GetHealth());
-	//		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, *PrintString);
-	//		if (TargetCharacter)
-	//		{
-
-	//			// Call for all health changes
-	//			//TargetCharacter->HandleHealthChanged(DeltaValue, SourceTags);
-	//		}
-
-	//		
-	//	}
-
-	//}
-	//if (Data.EvaluatedData.Attribute == GetSpeedAttribute())
-	//{
-	//	if (TargetCharacter)
-	//	{
-	//		TargetCharacter->HandleSpeedChanged(DeltaValue, SourceTags);
-	//	}
-	//}
-
-
-UAbilitySystemComponent* Source = Data.EffectSpec.GetContext().GetOriginalInstigatorAbilitySystemComponent();
-if (GetHealthAttribute() == Data.EvaluatedData.Attribute)
-{
-	// Get the Target actor
-	AActor* DamagedActor = nullptr;
-	AController* DamagedController = nullptr;
-	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
+	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{
-		DamagedActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
-		DamagedController = Data.Target.AbilityActorInfo->PlayerController.Get();
-	}
-	// Get the Source actor
-	AActor* AttackingActor = nullptr;
-	AController* AttackingController = nullptr;
-	AController* AttackingPlayerController = nullptr;
-	if (Source && Source->AbilityActorInfo.IsValid() && Source->AbilityActorInfo->AvatarActor.IsValid())
-	{
-		AttackingActor = Source->AbilityActorInfo->AvatarActor.Get();
-		AttackingController = Source->AbilityActorInfo->PlayerController.Get();
-		AttackingPlayerController = Source->AbilityActorInfo->PlayerController.Get();
-		if (AttackingController == nullptr && AttackingActor != nullptr)
+		// Store a local copy of the amount of Damage done and clear the Damage attribute.
+		const float LocalDamageDone = GetDamage();
+
+		SetDamage(0.f);
+
+		if (LocalDamageDone > 0.0f)
 		{
-			if (APawn* Pawn = Cast<APawn>(AttackingActor))
+			
+			// Apply the Health change and then clamp it.
+			const float NewHealth = GetCurrentHealth() - LocalDamageDone;
+			FString TheFloatStr = FString::SanitizeFloat(NewHealth);
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, *TheFloatStr);
+			SetCurrentHealth(FMath::Clamp(NewHealth, 0.0f, GetMaximumHealth()));
+			 TheFloatStr = FString::SanitizeFloat(GetCurrentHealth());
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, *TheFloatStr);
+		}
+	}
+
+	else if (Data.EvaluatedData.Attribute == GetHealingAttribute())
+	{
+		// Store a local copy of the amount of Healing done and clear the Healing attribute.
+		const float LocalHealingDone = GetHealing();
+
+		SetHealing(0.f);
+
+		if (LocalHealingDone > 0.0f)
+		{
+			// Apply the Health change and then clamp it.
+			const float NewHealth = GetCurrentHealth() + LocalHealingDone;
+
+			SetCurrentHealth(FMath::Clamp(NewHealth, 0.0f, GetMaximumHealth()));
+		}
+	}
+
+	else if (Data.EvaluatedData.Attribute == GetCurrentHealthAttribute())
+	{
+		SetCurrentHealth(FMath::Clamp(GetCurrentHealth(), 0.0f, GetMaximumHealth()));
+		FString TheFloatStr = FString::SanitizeFloat(GetCurrentHealth());
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, *TheFloatStr);
+		if (GetCurrentHealth() <= 0)
+		{
+			AZEROCharacter* AvatarCharacter = Cast<AZEROCharacter>(Data.Target.GetAvatarActor());
+
+			if (AvatarCharacter)
 			{
-				AttackingController = Pawn->GetController();
+				// Empty function from Character Base that logic can be added to.
+				//AvatarCharacter->On_Death();
+				
 			}
 		}
 	}
-	// Clamp health
-	SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
-	if (GetHealth() <= 0)
-	{
-		// Handle death with GASCharacter. Note this is just one example of how this could be done.
-		if (AZEROCharacter* ZEROChar = Cast<AZEROCharacter>(DamagedActor))
-		{
-			// Construct a gameplay cue event for this death
-			FGameplayCueParameters Params(Data.EffectSpec.GetContext());
-			Params.RawMagnitude = Data.EvaluatedData.Magnitude;
-			Params.NormalizedMagnitude = FMath::Abs(Data.EvaluatedData.Magnitude / GetMaxHealth());
-			Params.AggregatedSourceTags = *Data.EffectSpec.CapturedSourceTags.GetAggregatedTags();
-			Params.AggregatedTargetTags = *Data.EffectSpec.CapturedTargetTags.GetAggregatedTags();
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "Dead");
-		}
-	}
-}
 
+	else if (Data.EvaluatedData.Attribute == GetHealthRegenerationAttribute())
+	{
+		SetHealthRegeneration(FMath::Clamp(GetHealthRegeneration(), 0.0f, GetMaximumHealth()));
+	}
 }
 
 void UBaseChar_AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION_NOTIFY(UBaseChar_AttributeSet, Health, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UBaseChar_AttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UBaseChar_AttributeSet, Stamina, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UBaseChar_AttributeSet, Speed, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseChar_AttributeSet, CurrentHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseChar_AttributeSet, MaximumHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseChar_AttributeSet, HealthRegeneration, COND_None, REPNOTIFY_Always)
 }
 
-void UBaseChar_AttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
+void UBaseChar_AttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, const float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty) const
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseChar_AttributeSet, Health, OldHealth);
-}
+	UAbilitySystemComponent* AbilitySystemComponent = GetOwningAbilitySystemComponent();
 
-void UBaseChar_AttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth)
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseChar_AttributeSet, MaxHealth, OldMaxHealth);
-}
-
-void UBaseChar_AttributeSet::OnRep_Stamina(const FGameplayAttributeData& OldStamina)
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseChar_AttributeSet, Stamina, OldStamina);
-}
-
-void UBaseChar_AttributeSet::OnRep_Speed(const FGameplayAttributeData& OldSpeed)
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseChar_AttributeSet, Speed, OldSpeed);
-}
-
-void UBaseChar_AttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData & AffectedAttribute, const FGameplayAttributeData & MaxAttribute, float NewMaxValue, const FGameplayAttribute & AffectedAttributeProperty)
-{
-	UAbilitySystemComponent* AbilityComp = GetOwningAbilitySystemComponent();
 	const float CurrentMaxValue = MaxAttribute.GetCurrentValue();
-	if (!FMath::IsNearlyEqual(CurrentMaxValue, NewMaxValue) && AbilityComp)
-	{
-		// Change current value to maintain the current Val / Max percent
-		const float CurrentValue = AffectedAttribute.GetCurrentValue();
-		float NewDelta = (CurrentMaxValue > 0.f) ? (CurrentValue * NewMaxValue / CurrentMaxValue) - CurrentValue : NewMaxValue;
 
-		AbilityComp->ApplyModToAttributeUnsafe(AffectedAttributeProperty, EGameplayModOp::Additive, NewDelta);
+	if (!FMath::IsNearlyEqual(CurrentMaxValue, NewMaxValue) && AbilitySystemComponent)
+	{
+		// Change current value to maintain the Current Value / Maximum Value percentage.
+		const float CurrentValue = AffectedAttribute.GetCurrentValue();
+		const float NewDelta = (CurrentMaxValue > 0.f) ? (CurrentValue * NewMaxValue / CurrentMaxValue) - CurrentValue : NewMaxValue;
+
+		AbilitySystemComponent->ApplyModToAttributeUnsafe(AffectedAttributeProperty, EGameplayModOp::Additive, NewDelta);
 	}
+}
+
+void UBaseChar_AttributeSet::OnRep_CurrentHealth(const FGameplayAttributeData & OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseChar_AttributeSet, CurrentHealth, OldValue);
+}
+
+void UBaseChar_AttributeSet::OnRep_MaximumHealth(const FGameplayAttributeData & OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseChar_AttributeSet, MaximumHealth, OldValue);
+}
+
+void UBaseChar_AttributeSet::OnRep_HealthRegeneration(const FGameplayAttributeData & OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseChar_AttributeSet, HealthRegeneration, OldValue);
 }

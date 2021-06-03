@@ -22,51 +22,53 @@ class ZERO_API UBaseChar_AttributeSet : public UAttributeSet
 	GENERATED_BODY()
 
 public:
+
 	UBaseChar_AttributeSet();
+
+	// Attribute Set Overrides.
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
+	// Set Attributes to replicate.
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Attribute", ReplicatedUsing = OnRep_Health)
-		FGameplayAttributeData Health;
+	// Used to create a local copy of Damage which is then subtracted from Current Health.
+	UPROPERTY(BlueprintReadOnly, Category = "Health Attribute Set", meta = (HideFromLevelInfos))
+		FGameplayAttributeData Damage;
+	ATTRIBUTE_ACCESSORS(UBaseChar_AttributeSet, Damage)
 
-	ATTRIBUTE_ACCESSORS(UBaseChar_AttributeSet, Health);
+		// Used to create a local copy of Healing which is then added to Current Health.
+		UPROPERTY(BlueprintReadOnly, Category = "Health Attribute Set", meta = (HideFromLevelInfos))
+		FGameplayAttributeData Healing;
+	ATTRIBUTE_ACCESSORS(UBaseChar_AttributeSet, Healing)
 
-	UFUNCTION()
-		virtual void OnRep_Health(const FGameplayAttributeData& OldHealth);
+		// Holds the current value for Health.
+		UPROPERTY(BlueprintReadOnly, Category = "Health Attribute Set", ReplicatedUsing = OnRep_CurrentHealth)
+		FGameplayAttributeData CurrentHealth;
+	ATTRIBUTE_ACCESSORS(UBaseChar_AttributeSet, CurrentHealth)
 
+		// Holds the value for Maximum Health.
+		UPROPERTY(BlueprintReadOnly, Category = "Health Attribute Set", ReplicatedUsing = OnRep_MaximumHealth)
+		FGameplayAttributeData MaximumHealth;
+	ATTRIBUTE_ACCESSORS(UBaseChar_AttributeSet, MaximumHealth)
 
-
-	UPROPERTY(BlueprintReadOnly, Category = "Attribute", ReplicatedUsing = OnRep_MaxHealth)
-		FGameplayAttributeData MaxHealth;
-
-	ATTRIBUTE_ACCESSORS(UBaseChar_AttributeSet, MaxHealth);
-
-	UFUNCTION()
-		virtual void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth);
-
-
-	UPROPERTY(BlueprintReadOnly, Category = "Attribute", ReplicatedUsing = OnRep_Stamina)
-		FGameplayAttributeData Stamina;
-
-	ATTRIBUTE_ACCESSORS(UBaseChar_AttributeSet, Stamina);
-
-	UFUNCTION()
-		virtual void OnRep_Stamina(const FGameplayAttributeData& OldStamina);
-
-	UPROPERTY(BlueprintReadOnly, Category = "Attribute", ReplicatedUsing = OnRep_Speed)
-		FGameplayAttributeData Speed;
-
-	ATTRIBUTE_ACCESSORS(UBaseChar_AttributeSet, Speed);
-
-	UFUNCTION()
-		virtual void OnRep_Speed(const FGameplayAttributeData& OldSpeed);
+		// Holds the value for Health Regeneration.
+		UPROPERTY(BlueprintReadOnly, Category = "Health Attribute Set", ReplicatedUsing = OnRep_HealthRegeneration)
+		FGameplayAttributeData HealthRegeneration;
+	ATTRIBUTE_ACCESSORS(UBaseChar_AttributeSet, HealthRegeneration)
 
 protected:
-	/** Helper function to proportionally adjust the value of an attribute when it's associated max attribute changes. (i.e. When MaxHealth increases, Health increases by an amount that maintains the same percentage as before) */
-	void AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty);
 
+	void AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty) const;
+
+	UFUNCTION()
+		virtual void OnRep_CurrentHealth(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+		virtual void OnRep_MaximumHealth(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+		virtual void OnRep_HealthRegeneration(const FGameplayAttributeData& OldValue);
 
 	
 };
