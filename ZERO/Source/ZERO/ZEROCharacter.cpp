@@ -13,7 +13,8 @@
 #include"BaseChar_AttributeSet.h"
 #include"BaseChar_BaseGameplayAbility.h"
 #include "Net/UnrealNetwork.h"
-
+#include "Components/BoxComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
 //////////////////////////////////////////////////////////////////////////
 // AZEROCharacter
 
@@ -48,6 +49,12 @@ AZEROCharacter::AZEROCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	AttackCollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackCollisonComp"));
+	FName AttackSock = "Attack_Socket";
+	AttackCollisionComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, AttackSock);
+	AttackCollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AttackCollisionComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	AttackCollisionComp->OnComponentHit.AddDynamic(this, &AZEROCharacter::OnHitAttack);
 
 
 	//GAS Components
@@ -219,6 +226,61 @@ void AZEROCharacter::IncrementComboCount()
 void AZEROCharacter::SetTeamBeforeSpawn(ETeamID TID)
 {
 	TeamID = TID;
+}
+
+void AZEROCharacter::OnHitAttack(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComponent, FVector NormalImpulse, const FHitResult & Hit)
+{
+	if (OtherActor != this && OtherActor != GetOwner())
+	{
+
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "REP.Hit");
+		
+		AZEROCharacter* Villan = Cast<AZEROCharacter>(OtherActor);
+		if (Villan)
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "REP.Hit");
+			FGameplayEventData Pay;
+			Pay.Instigator = this;
+			Pay.Target = Villan;
+			FGameplayAbilityTargetDataHandle TDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(Villan);
+			//FGameplayAbilityTargetData TData;
+			Pay.TargetData = TDataHandle;
+
+			FGameplayTag TagX = FGameplayTag::RequestGameplayTag(FName("Weapon.Projectile.Hit"));
+			//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TagX.ToString());
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, TagX, Pay);
+
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, "Hit");
+
+		}
+		else
+		{
+			
+			//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, "HitSomthingElse");
+		}
+	}
+}
+
+float AZEROCharacter::GetCurrentHealthAttributeFloat()
+{
+	return AttributeSet->GetCurrentHealth();
+}
+
+float AZEROCharacter::GetMaxHealthAttributeFloat()
+{
+	
+	return AttributeSet->GetMaximumHealth();
+}
+
+ETeamID AZEROCharacter::GetTeamID()
+{
+	return TeamID;
+}
+
+void AZEROCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	AttackCollisionComp->OnComponentHit.AddDynamic(this, &AZEROCharacter::OnHitAttack);
 }
 
 void AZEROCharacter::OnResetVR()

@@ -46,6 +46,17 @@ void UBaseChar_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModC
 			SetCurrentHealth(FMath::Clamp(NewHealth, 0.0f, GetMaximumHealth()));
 			 TheFloatStr = FString::SanitizeFloat(GetCurrentHealth());
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, *TheFloatStr);
+			if (GetCurrentHealth() <= 0)
+			{
+				AZEROCharacter* AvatarCharacter = Cast<AZEROCharacter>(Data.Target.GetAvatarActor());
+
+				if (AvatarCharacter)
+				{
+					// Empty function from Character Base that logic can be added to.
+					//AvatarCharacter->On_Death();
+					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "Dead");
+				}
+			}
 		}
 	}
 
@@ -68,19 +79,8 @@ void UBaseChar_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModC
 	else if (Data.EvaluatedData.Attribute == GetCurrentHealthAttribute())
 	{
 		SetCurrentHealth(FMath::Clamp(GetCurrentHealth(), 0.0f, GetMaximumHealth()));
-		FString TheFloatStr = FString::SanitizeFloat(GetCurrentHealth());
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, *TheFloatStr);
-		if (GetCurrentHealth() <= 0)
-		{
-			AZEROCharacter* AvatarCharacter = Cast<AZEROCharacter>(Data.Target.GetAvatarActor());
-
-			if (AvatarCharacter)
-			{
-				// Empty function from Character Base that logic can be added to.
-				//AvatarCharacter->On_Death();
-				
-			}
-		}
+		
+		
 	}
 
 	else if (Data.EvaluatedData.Attribute == GetHealthRegenerationAttribute())

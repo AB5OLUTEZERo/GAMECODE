@@ -25,11 +25,16 @@ class AZEROCharacter : public ACharacter, public IAbilitySystemInterface
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class UBaseChar_AbilitySystemComponent* AbilitySystemComp;
 
+	
+
 	UPROPERTY()
 		class UBaseChar_AttributeSet* AttributeSet;
 public:
 	AZEROCharacter();
 
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+		class UBoxComponent* AttackCollisionComp;
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -86,9 +91,24 @@ public:
 
 	UFUNCTION()
 		void SetTeamBeforeSpawn(ETeamID TID);
+
+	UFUNCTION()
+		void OnHitAttack(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+
+
+	UFUNCTION(BlueprintPure, Category = "UI")
+		float GetCurrentHealthAttributeFloat();
+
+	UFUNCTION(BlueprintPure, Category = "UI")
+		float GetMaxHealthAttributeFloat();
+
+	UFUNCTION(BlueprintPure, Category = "UI")
+		ETeamID GetTeamID();
 	
 protected:
 
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
 
