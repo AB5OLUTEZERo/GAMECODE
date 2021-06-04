@@ -153,11 +153,13 @@ void UGA_Yatagarasu_SunSlash::SlashOnOverlapBegin(UPrimitiveComponent * Overlapp
 		const AZEROCharacter* Villan = Cast<	AZEROCharacter>(OtherActor);
 		if (Villan)
 		{
-			//Applying the effects only if they are of type ZEROCharacter effect is for damage and FX
-			FGameplayAbilityTargetDataHandle TDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(OtherActor);
-			ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, TDataHandle, DamageGameplayEffect, 1);
-			ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, TDataHandle, CueGameplayEffect, 1);
-		
+			if (Hero->TeamID != Villan->TeamID)
+			{
+				//Applying the effects only if they are of type ZEROCharacter effect is for damage and FX
+				FGameplayAbilityTargetDataHandle TDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(OtherActor);
+				ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, TDataHandle, DamageGameplayEffect, 1);
+				ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, TDataHandle, CueGameplayEffect, 1);
+			}
 		}
 	}
 }

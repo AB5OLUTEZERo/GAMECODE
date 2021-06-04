@@ -43,6 +43,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+		TSubclassOf<UUserWidget> HUDWidget;
+
+	UUserWidget* MyHUD;
 
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent()const override;
 
@@ -54,14 +58,9 @@ public:
 	virtual void OnRep_PlayerState() override;
 
 
-	UFUNCTION()
-		void HandleHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
 	UFUNCTION()
-		void HandleSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-
-	UFUNCTION()
-		void HandleDeath(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+		void HandleDeath();
 
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GAS")
@@ -95,6 +94,8 @@ public:
 	UFUNCTION()
 		void OnHitAttack(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 
+	UFUNCTION(BlueprintCallable, Category = "Cast")
+		void HandleCastEvent();
 
 	UFUNCTION(BlueprintPure, Category = "UI")
 		float GetCurrentHealthAttributeFloat();

@@ -47,6 +47,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 		FString GCTagForImpact;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Homing)
+		bool bIsCameraControlled;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Homing)
 		bool bIsAHomingProjectile;

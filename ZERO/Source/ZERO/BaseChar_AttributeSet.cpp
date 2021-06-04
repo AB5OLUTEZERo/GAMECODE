@@ -53,7 +53,7 @@ void UBaseChar_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModC
 				if (AvatarCharacter)
 				{
 					// Empty function from Character Base that logic can be added to.
-					//AvatarCharacter->On_Death();
+					AvatarCharacter->HandleDeath();
 					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "Dead");
 				}
 			}

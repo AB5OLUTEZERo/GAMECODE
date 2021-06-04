@@ -15,6 +15,9 @@
 #include "Net/UnrealNetwork.h"
 #include "Components/BoxComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "Components/Widget.h"
+#include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
 //////////////////////////////////////////////////////////////////////////
 // AZEROCharacter
 
@@ -68,6 +71,7 @@ AZEROCharacter::AZEROCharacter()
 	AbilitySystemComp->RegisterGameplayTagEvent(FGameplayTag::RequestGameplayTag(FName("Player.Debuff.Stun")), EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AZEROCharacter::StunTagChanged);
 
 
+	bUseControllerRotationYaw = true;
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 
@@ -141,19 +145,12 @@ void AZEROCharacter::OnRep_PlayerState()
 	}
 }
 
-void AZEROCharacter::HandleHealthChanged(float DeltaValue, const FGameplayTagContainer & EventTags)
-{
-	
-}
 
-void AZEROCharacter::HandleSpeedChanged(float DeltaValue, const FGameplayTagContainer & EventTags)
-{
-	
-}
 
-void AZEROCharacter::HandleDeath(float DeltaValue, const FGameplayTagContainer & EventTags)
+void AZEROCharacter::HandleDeath()
 {
-	
+	GetCharacterMovement()->MaxWalkSpeed = 0;
+	MyHUD->RemoveFromParent();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -261,6 +258,16 @@ void AZEROCharacter::OnHitAttack(UPrimitiveComponent * HitComponent, AActor * Ot
 	}
 }
 
+void AZEROCharacter::HandleCastEvent()
+{
+	FGameplayEventData Pay;
+	Pay.Instigator = this;
+	
+
+	FGameplayTag TagX = FGameplayTag::RequestGameplayTag(FName());
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, TagX, Pay);
+}
+
 float AZEROCharacter::GetCurrentHealthAttributeFloat()
 {
 	return AttributeSet->GetCurrentHealth();
@@ -281,6 +288,26 @@ void AZEROCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	AttackCollisionComp->OnComponentHit.AddDynamic(this, &AZEROCharacter::OnHitAttack);
+	if (HUDWidget)
+	{
+		if (HasAuthority())
+		{
+			MyHUD = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), HUDWidget);
+			if (MyHUD)
+			{
+				MyHUD->AddToViewport();
+			}
+		}
+		if (IsLocallyControlled())
+		{
+			
+			MyHUD = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), HUDWidget);
+			if (MyHUD)
+			{
+				MyHUD->AddToViewport();
+			}
+		}
+	}
 }
 
 void AZEROCharacter::OnResetVR()

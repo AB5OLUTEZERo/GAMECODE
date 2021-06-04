@@ -67,13 +67,15 @@ void UGA_BaseChar_MeleeAttack::EventReceived(FGameplayTag EventTag, FGameplayEve
 {
 	
 	
-	const AZEROCharacter* Hero2 = Cast<	AZEROCharacter>(EventData.Target);
+	const AZEROCharacter* Villan = Cast<	AZEROCharacter>(EventData.Target);
 
 	DrawDebugSphere(GetWorld(), Hero->GetActorLocation(), 32, 32, FColor::Blue, false, 20);
 	FGameplayAbilityTargetDataHandle Handle;
 	Handle.Append(EventData.TargetData);
-	ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, EventData.TargetData, DamageGameplayEffect, 1);
-
+	if (Hero->TeamID != Villan->TeamID)
+	{
+		ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, EventData.TargetData, DamageGameplayEffect, 1);
+	}
 	//ApplyCost(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo);
 	Hero->IncrementComboCount();
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);

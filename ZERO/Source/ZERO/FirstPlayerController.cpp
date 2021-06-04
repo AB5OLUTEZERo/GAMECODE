@@ -60,16 +60,16 @@ void AFirstPlayerController::BeginPlay()
 			{
 				MyMenu->AddToViewport();
 
-				FInputModeUIOnly InputModeData;
-				// Step 2 config is specific to the type
-				
-				InputModeData.SetWidgetToFocus(MyMenu->TakeWidget()); //Because UMG wraps Slate
+				//FInputModeUIOnly InputModeData;
+				//// Step 2 config is specific to the type
+				//
+				//InputModeData.SetWidgetToFocus(MyMenu->TakeWidget()); //Because UMG wraps Slate
 
-				// Step 3 set the mode for the player controller
-				//SetInputMode(InputModeData);
+				//// Step 3 set the mode for the player controller
+				////SetInputMode(InputModeData);
 			
-				// Step 4 enable cursor so you know what to click on:
-				bShowMouseCursor = true;
+				//// Step 4 enable cursor so you know what to click on:
+				//bShowMouseCursor = true;
 			}
 		}
 	}

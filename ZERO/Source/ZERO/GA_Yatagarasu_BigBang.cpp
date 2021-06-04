@@ -85,23 +85,27 @@ void UGA_Yatagarasu_BigBang::EventReceived(FGameplayTag EventTag, FGameplayEvent
 	{
 		//checking if the actor is a ZEROCharacter to have a extra layer of check even though the overlap function only returns ZEROCharacters
 		AZEROCharacter* ZTarget = Cast<AZEROCharacter>(Target);
+		
 		if (ZTarget)
 		{
-			FVector KnockBackDir = ((ZTarget->GetActorLocation()) - (Hero->GetActorLocation())).GetSafeNormal() * KnockBackStrength;
-			KnockBackDir.Z += 20;
-			//Adding a knock back
-			ZTarget->LaunchCharacter(KnockBackDir, true, true);
+			if (Hero->TeamID != ZTarget->TeamID)
+			{
+				FVector KnockBackDir = ((ZTarget->GetActorLocation()) - (Hero->GetActorLocation())).GetSafeNormal() * KnockBackStrength;
+				KnockBackDir.Z += 20;
+				//Adding a knock back
+				ZTarget->LaunchCharacter(KnockBackDir, true, true);
 
-			//Applying gameplay effect
-			FGameplayAbilityTargetDataHandle TDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(ZTarget);
-			ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, TDataHandle, DamageGameplayEffect, 1);
+				//Applying gameplay effect
+				FGameplayAbilityTargetDataHandle TDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(ZTarget);
+				ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, TDataHandle, DamageGameplayEffect, 1);
 
 
-			//Applying FX
-			FGameplayCueParameters HitImpactParams;
-			HitImpactParams.Location = ZTarget->GetActorLocation();
-			FGameplayTag TagHitImpact = FGameplayTag::RequestGameplayTag(FName(GCTagForBlastHit));
-			ZTarget->GetAbilitySystemComponent()->AddGameplayCue(TagHitImpact, HitImpactParams);
+				//Applying FX
+				FGameplayCueParameters HitImpactParams;
+				HitImpactParams.Location = ZTarget->GetActorLocation();
+				FGameplayTag TagHitImpact = FGameplayTag::RequestGameplayTag(FName(GCTagForBlastHit));
+				ZTarget->GetAbilitySystemComponent()->AddGameplayCue(TagHitImpact, HitImpactParams);
+			}
 		}
 
 	}

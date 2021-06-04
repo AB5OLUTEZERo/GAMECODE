@@ -28,7 +28,7 @@ void UGA_BaseProjectileAndWaitForEvent::ActivateAbility(const FGameplayAbilitySp
 	Hero = Cast<	AZEROCharacter>(GetAvatarActorFromActorInfo());
 	if (Hero)
 	{
-
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, "RepFire");
 		FString MeleeStartSection = "Throw" ;
 		//FName MontageSectionName = FName(*MeleeStartSection);
 		Task = UAT_PlayMontageAndWaitForEvent::PlayMontageAndWaitForEvent(this, NAME_None, MontageToPlay, FGameplayTagContainer(), 1.0f, FName(*MeleeStartSection), false, 1.0f);
@@ -64,11 +64,15 @@ AZEROCharacter * UGA_BaseProjectileAndWaitForEvent::FindClosestTargetToHero()
 	{
 		if (_TempArryActors[i] != Hero)
 		{
+			AZEROCharacter* Villan = Cast<AZEROCharacter>(_TempArryActors[i]);
 			float dist = FVector::Dist(Hero->GetActorLocation(), _TempArryActors[i]->GetActorLocation());
 			if (dist < ClosestDis)
 			{
-				ClosestDis = dist;
-				Target = Cast<AZEROCharacter>(_TempArryActors[i]);
+				if (Hero->TeamID != Villan->TeamID)
+				{
+					ClosestDis = dist;
+					Target = Villan;
+				}
 			}
 		}
 	}
@@ -90,12 +94,17 @@ void UGA_BaseProjectileAndWaitForEvent::EventReceived(FGameplayTag EventTag, FGa
 	{
 		// Get the camera transform.
 		
-		FVector CameraLocation = Hero->GetMesh()->GetSocketLocation(FName(*MuzzleLocationName));;
-		FRotator CameraRotation = Hero->GetActorRotation();
-		// Hero->GetActorEyesViewPoint(CameraLocation, CameraRotation);
-
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		Hero->GetActorEyesViewPoint(CameraLocation, CameraRotation);
+		CameraLocation = Hero->GetMesh()->GetSocketLocation(FName(*MuzzleLocationName));
 		 // Set MuzzleOffset to spawn projectiles slightly in front of the camera.
 		MuzzleOffset.Set(100.0f, 0.0f, 0.0f);
+
+		if (!bIsCameraControlled)
+		{
+			CameraRotation = Hero->GetActorRotation();
+		}
 
 		// Transform MuzzleOffset from camera space to world space.
 		FVector MuzzleLocation = CameraLocation + (Hero->GetActorForwardVector() * MuzzleOffsetDistance);
@@ -119,7 +128,7 @@ void UGA_BaseProjectileAndWaitForEvent::EventReceived(FGameplayTag EventTag, FGa
 				if (!Projectile)
 				{
 					// Spawn the projectile at the muzzle.
-				  //  GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, "RepFire");
+				  // GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, "Event recied");
 					Projectile = World->SpawnActor<AGAS_HitActor>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams);
 					Projectile->SetOwner(GetAvatarActorFromActorInfo());
 					FGameplayCueParameters ImpactParams;
@@ -194,19 +203,23 @@ void UGA_BaseProjectileAndWaitForEvent::HitEventReceived(FGameplayEventData Even
 
 	
 	const AZEROCharacter* Villan = Cast<	AZEROCharacter>(EventData.Target);
-	if (Villan && GetCurrentActivationInfo().ActivationMode == EGameplayAbilityActivationMode::Authority)
-	{
-		FGameplayCueParameters ImpactParams;
-		ImpactParams.Location = Villan->GetActorLocation();
+	
+		if (Villan && GetCurrentActivationInfo().ActivationMode == EGameplayAbilityActivationMode::Authority)
+		{
+			FGameplayCueParameters ImpactParams;
+			ImpactParams.Location = Villan->GetActorLocation();
 
-		FGameplayTag TagImpact = FGameplayTag::RequestGameplayTag(FName(GCTagForImpact));
+			FGameplayTag TagImpact = FGameplayTag::RequestGameplayTag(FName(GCTagForImpact));
 
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "Effect");
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "Effect");
 			Villan->GetAbilitySystemComponent()->AddGameplayCue(TagImpact, ImpactParams);
-			ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, EventData.TargetData, DamageGameplayEffect, 1);
-		
-		
-	}
+			if (Hero->TeamID != Villan->TeamID)
+			{
+				ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, EventData.TargetData, DamageGameplayEffect, 1);
+			}
+
+		}
+	
 }
 
 void UGA_BaseProjectileAndWaitForEvent::ProjectileDestroyed(AActor * DestroyedActor)
