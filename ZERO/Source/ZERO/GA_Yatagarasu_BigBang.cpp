@@ -79,7 +79,7 @@ void UGA_Yatagarasu_BigBang::EventReceived(FGameplayTag EventTag, FGameplayEvent
 	TArray < AActor* > BangOutActors;
 
 	//getting all the player around the user 
-	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), Hero->GetActorLocation(), Range, BangObjectTypes, Hero->GetClass(), BangActorsToIgnore, BangOutActors);
+	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), Hero->GetActorLocation(), Range, BangObjectTypes,AZEROCharacter::StaticClass(), BangActorsToIgnore, BangOutActors);
 	//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Black, "Activate");
 	for (AActor* Target : BangOutActors)
 	{
