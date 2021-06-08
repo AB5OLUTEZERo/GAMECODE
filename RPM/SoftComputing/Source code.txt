@@ -1,0 +1,47 @@
+mydata<- read.csv(file="C:/Users/Preetham/Desktop/diabates_ind.csv", header=TRUE, sep=",")
+gootes<- read.csv(file="C:/Users/Preetham/Desktop/testdiabates.csv", header=TRUE, sep=",") hist(mydata$Outcome)
+normalize<- function(x) {
+return ((x - min(x)) / (max(x) - min(x))) }
+maxmindf<- as.data.frame(lapply(mydata, normalize)) trainset<- maxmindf[1:500, ]
+testset<-maxmindf[500:767,] #testset<-data.frame(gootes)
+library(neuralnet) nn = neuralnet(Outcome~Pregnencies+Glucose+BP+ Skin+Insulin+BMI+DiaPFun+Age,rep=1, hidden=2,data=trainset,
+
+linear.output=FALSE, threshold=0.01,startweights = c(0.98,0.27,0.353,0.475,0.542,0.326,0.758,0.89,0.99,011,0.12,0.13,0.14,0.15,0.16,
+0.17,0.18,0.1,0.23,0.24,0.26),algorithm = "backprop",learningrate = 0.01) nn$result.matrix
+plot(nn)
+temp_test<- subset(testset, select = c("Pregnencies","Glucose","BP","Skin","Insulin","BMI","DiaPFun","Age")) prediction<-compute(nn,temp_test[1:8])
+prediction<-prediction$net.result prediction actual<-testset$Outcome
+actual MSE<-sum((prediction-actual)^2)/nrow(gootes) MSE
+plot(testset$Outcome,prediction,col='blue',main = "real vs predicted",pch=1,cex=1,type = "p",xlab = "actual",ylab = "predicted")
+
+
+
+decision tree algoritham for R code :
+library(neuralnet) set.seed(123)
+data <- read.csv("diabetes.csv",header = TRUE,",") class(data)
+str(data) help("data")
+hist(data$Outcome) dim(data) apply(data,2,range)
+
+maxvalue<-apply(data,2,max) minvalue<-apply(data,2,min)
+
+data<-as.data.frame(scale(data,center = minvalue,scale=maxvalue-minvalue)) ind<-sample(1:nrow(data),600)
+train<-data[ind,] test<-data[-ind,]
+
+
+allvars<-colnames(data)
+pred<-allvars[!allvars%in%"Outcome"] pred<-paste(pred,collapse = "+")
+form<-as.formula(paste("Outcome~",pred,collapse = "+")) neural<-neuralnet(formula=form,hidden = c(4,2),stepmax=1e6,linear.output=F,data=train) plot(neural)
+
+
+prediction<-compute(neural,test[,1:8]) str(prediction)
+
+
+prediction<-prediction$net.result*(max(test$Outcome)-min(test$Outcome)
++min(test$Outcome))
+actual<-(test$Outcome)*(max(test$Outcome)-min(test$Outcome))
++min(test$Outcome)
+MSE<-sum((prediction-actual)^2)/nrow(test) MSE
+
+
+
+plot(test$Outcome,prediction,col='blue',main='Real vs predicted',pch=1,cex=0.9,type="p",xlab="actual",ylab="pedicted") abline(0,1,col="black")
