@@ -11,8 +11,8 @@ void UANS_MeleeAttackAnimNotifyState::NotifyBegin(USkeletalMeshComponent * MeshC
 	if (MyPlayer)
 	{
 		MyPlayer->AttackCollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		MyPlayer->AttackCollisionComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, "NotifyStart");
+		MyPlayer->AttackCollisionComp->SetGenerateOverlapEvents(true);
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Blue, "NotifyStart");
 	}
 }
 void UANS_MeleeAttackAnimNotifyState::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
@@ -20,8 +20,8 @@ void UANS_MeleeAttackAnimNotifyState::NotifyEnd(USkeletalMeshComponent * MeshCom
 	AZEROCharacter* MyPlayer = Cast<AZEROCharacter>(MeshComp->GetOwner());
 	if (MyPlayer)
 	{
-		MyPlayer->AttackCollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		MyPlayer->AttackCollisionComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "NotifyEnd");
+		MyPlayer->AttackCollisionComp->SetGenerateOverlapEvents(false);
+		MyPlayer->AttackCollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 	}
 }

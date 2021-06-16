@@ -56,9 +56,10 @@ AZEROCharacter::AZEROCharacter()
 	FName AttackSock = "Attack_Socket";
 	AttackCollisionComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, AttackSock);
 	AttackCollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	AttackCollisionComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	AttackCollisionComp->OnComponentHit.AddDynamic(this, &AZEROCharacter::OnHitAttack);
-
+	AttackCollisionComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+	
+	//AttackCollisionComp->OnComponentHit.AddDynamic(this, &AZEROCharacter::OnHitAttack);
+	AttackCollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AZEROCharacter::AttackOnOverlapBegin);
 
 	//GAS Components
 	AbilitySystemComp = CreateDefaultSubobject<UBaseChar_AbilitySystemComponent>(TEXT("AbilitySystemComp"));
@@ -151,6 +152,7 @@ void AZEROCharacter::HandleDeath()
 {
 	GetCharacterMovement()->MaxWalkSpeed = 0;
 	MyHUD->RemoveFromParent();
+	Destroy();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -194,7 +196,7 @@ void AZEROCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AZEROCharacter, TeamID);
-	
+
 }
 
 
@@ -227,6 +229,7 @@ void AZEROCharacter::SetTeamBeforeSpawn(ETeamID TID)
 
 void AZEROCharacter::OnHitAttack(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComponent, FVector NormalImpulse, const FHitResult & Hit)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "REP.Hit");
 	if (OtherActor != this && OtherActor != GetOwner())
 	{
 
@@ -253,6 +256,40 @@ void AZEROCharacter::OnHitAttack(UPrimitiveComponent * HitComponent, AActor * Ot
 		else
 		{
 			
+			//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, "HitSomthingElse");
+		}
+	}
+}
+
+void AZEROCharacter::AttackOnOverlapBegin(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "REP.Hit");
+	if (OtherActor != this && OtherActor != GetOwner())
+	{
+
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "REP.Hit");
+
+		AZEROCharacter* Villan = Cast<AZEROCharacter>(OtherActor);
+		if (Villan)
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "REP.Hit");
+			FGameplayEventData Pay;
+			Pay.Instigator = this;
+			Pay.Target = Villan;
+			FGameplayAbilityTargetDataHandle TDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(Villan);
+			//FGameplayAbilityTargetData TData;
+			Pay.TargetData = TDataHandle;
+
+			FGameplayTag TagX = FGameplayTag::RequestGameplayTag(FName("Weapon.Projectile.Hit"));
+			//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TagX.ToString());
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, TagX, Pay);
+
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, "Hit");
+
+		}
+		else
+		{
+
 			//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, "HitSomthingElse");
 		}
 	}
@@ -287,7 +324,9 @@ ETeamID AZEROCharacter::GetTeamID()
 void AZEROCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	AttackCollisionComp->OnComponentHit.AddDynamic(this, &AZEROCharacter::OnHitAttack);
+	//AttackCollisionComp->OnComponentHit.AddDynamic(this, &AZEROCharacter::OnHitAttack);
+	AttackCollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AZEROCharacter::AttackOnOverlapBegin);
+
 	if (HUDWidget)
 	{
 		if (HasAuthority())
