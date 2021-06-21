@@ -6,7 +6,9 @@
 #include"ZERO.h"
 #include"DrawDebugHelpers.h"
 #include "ZEROCharacter.h"
-
+#include "Animation/AnimInstance.h"
+#include "Components/BoxComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 UGA_BaseChar_MeleeAttack::UGA_BaseChar_MeleeAttack()
 {
@@ -32,7 +34,7 @@ void UGA_BaseChar_MeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle 
 
 
 	Hero = Cast<	AZEROCharacter>(GetAvatarActorFromActorInfo());
-
+	Hero->AttackCollisionComp->OnComponentEndOverlap.AddDynamic(this, &UGA_BaseChar_MeleeAttack::AttackOnOverlapEnd);
 	
 
 	if (Hero)
@@ -52,6 +54,30 @@ void UGA_BaseChar_MeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle 
 	}
 }
 
+void UGA_BaseChar_MeleeAttack::AttackOnOverlapBegin(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+	
+	//ApplyCost(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo);
+	//Hero->IncrementComboCount();
+	//EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+}
+
+void UGA_BaseChar_MeleeAttack::AttackOnOverlapEnd(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex)
+{
+	//const AZEROCharacter* Villan = Cast<	AZEROCharacter>(OtherActor);
+
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, "Hit");
+	////DrawDebugSphere(GetWorld(), Hero->GetActorLocation(), 32, 32, FColor::Blue, false, 20);
+
+
+	//if (Hero->TeamID != Villan->TeamID)
+	//{
+	//	FGameplayAbilityTargetDataHandle TDataHandle = UAbilitySystemBlueprintLibrary::AbilityTargetDataFromActor(OtherActor);
+	//	ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, TDataHandle, DamageGameplayEffect, 1);
+	//	//ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, EventData.TargetData, DamageGameplayEffect, 1);
+	//}
+}
+
 void UGA_BaseChar_MeleeAttack::OnCancelled(FGameplayTag EventTag, FGameplayEventData EventData)
 {
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
@@ -66,17 +92,20 @@ void UGA_BaseChar_MeleeAttack::OnCompleted(FGameplayTag EventTag, FGameplayEvent
 void UGA_BaseChar_MeleeAttack::EventReceived(FGameplayTag EventTag, FGameplayEventData EventData)
 {
 	
-	
+	//Hero->StopAnimMontage(AttackMontage);
 	const AZEROCharacter* Villan = Cast<	AZEROCharacter>(EventData.Target);
 
-	DrawDebugSphere(GetWorld(), Hero->GetActorLocation(), 32, 32, FColor::Blue, false, 20);
+	
+	//DrawDebugSphere(GetWorld(), Hero->GetActorLocation(), 32, 32, FColor::Blue, false, 20);
 	FGameplayAbilityTargetDataHandle Handle;
 	Handle.Append(EventData.TargetData);
 	if (Hero->TeamID != Villan->TeamID)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, "Hit");
 		ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, EventData.TargetData, DamageGameplayEffect, 1);
+		Hero->IncrementComboCount();
 	}
 	//ApplyCost(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo);
-	Hero->IncrementComboCount();
+	
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }

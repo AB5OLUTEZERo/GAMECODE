@@ -35,6 +35,13 @@ public:
 	class AZEROCharacter* Hero;
 
 
+	UFUNCTION()
+		void AttackOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+
+	UFUNCTION()
+		void AttackOnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 
 protected:
 

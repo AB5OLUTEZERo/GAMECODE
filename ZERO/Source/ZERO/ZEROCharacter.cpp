@@ -18,6 +18,7 @@
 #include "Components/Widget.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include"FirstGameMode.h"
 //////////////////////////////////////////////////////////////////////////
 // AZEROCharacter
 
@@ -59,7 +60,7 @@ AZEROCharacter::AZEROCharacter()
 	AttackCollisionComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 	
 	//AttackCollisionComp->OnComponentHit.AddDynamic(this, &AZEROCharacter::OnHitAttack);
-	AttackCollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AZEROCharacter::AttackOnOverlapBegin);
+	//AttackCollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AZEROCharacter::AttackOnOverlapBegin);
 
 	//GAS Components
 	AbilitySystemComp = CreateDefaultSubobject<UBaseChar_AbilitySystemComponent>(TEXT("AbilitySystemComp"));
@@ -153,6 +154,11 @@ void AZEROCharacter::HandleDeath()
 	GetCharacterMovement()->MaxWalkSpeed = 0;
 	MyHUD->RemoveFromParent();
 	Destroy();
+	AFirstGameMode* MyGameMode = Cast<AFirstGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (MyGameMode)
+	{
+		MyGameMode->CheckIfAllPlayersOfTeamIsDead(TeamID);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -196,6 +202,7 @@ void AZEROCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AZEROCharacter, TeamID);
+	DOREPLIFETIME(AZEROCharacter, ComboCount);
 
 }
 
@@ -284,7 +291,7 @@ void AZEROCharacter::AttackOnOverlapBegin(UPrimitiveComponent * OverlappedCompon
 			//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, TagX.ToString());
 			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, TagX, Pay);
 
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, "Hit");
+			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, "Hit");
 
 		}
 		else
@@ -320,6 +327,8 @@ ETeamID AZEROCharacter::GetTeamID()
 {
 	return TeamID;
 }
+
+
 
 void AZEROCharacter::BeginPlay()
 {

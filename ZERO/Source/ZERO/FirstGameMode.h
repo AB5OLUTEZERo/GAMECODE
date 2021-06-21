@@ -29,6 +29,17 @@ public:
 	UFUNCTION()
 		void RequestCharacterSpawn(TSubclassOf<AZEROCharacter> PlayerClass, ETeamID TeamID, AFirstPlayerController* ControllerRef);
 
+	TArray<class  AFirstPlayerController *> TeamAPlayers;
+	
+
+	TArray<class  AFirstPlayerController *> TeamBPlayers;
+
+
+	UFUNCTION()
+		void AddPlayerToTeamList(ETeamID TeamID, AFirstPlayerController* ControllerRef);
+
+	UFUNCTION()
+		void CheckIfAllPlayersOfTeamIsDead(ETeamID TeamID);
 	
 protected:
 	// Called when the game starts or when spawned

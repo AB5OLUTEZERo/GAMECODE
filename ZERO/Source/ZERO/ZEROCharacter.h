@@ -75,7 +75,7 @@ public:
 		virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
 
-	UPROPERTY(BlueprintReadOnly, Category = "Combo")
+	UPROPERTY(replicated,BlueprintReadOnly, Category = "Combo")
 		int ComboCount;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Combo")
@@ -107,6 +107,8 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "UI")
 		ETeamID GetTeamID();
+
+	
 	
 protected:
 
