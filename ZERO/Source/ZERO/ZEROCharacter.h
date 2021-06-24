@@ -62,6 +62,22 @@ public:
 	UFUNCTION()
 		void HandleDeath();
 
+	UFUNCTION()
+		void HandleKill();
+
+	UFUNCTION(BlueprintCallable, Category = "KDA")
+		float GetKillCount();
+
+
+	UPROPERTY(BlueprintReadOnly, Category = "KDA")
+	int ATeamKillCount;
+
+	UPROPERTY(BlueprintReadOnly, Category = "KDA")
+	int BTeamKillCount;
+
+	UFUNCTION()
+		void UpdateKillCount(int AK,int BK);
+		
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GAS")
 		TSubclassOf<class UGameplayEffect> DefaultGameplayEffect;

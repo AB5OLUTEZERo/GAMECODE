@@ -19,6 +19,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include"FirstGameMode.h"
+#include"FirstPlayerState.h"
+#include"FirstPlayerController.h"
 //////////////////////////////////////////////////////////////////////////
 // AZEROCharacter
 
@@ -55,8 +57,9 @@ AZEROCharacter::AZEROCharacter()
 
 	AttackCollisionComp = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackCollisonComp"));
 	FName AttackSock = "Attack_Socket";
-	AttackCollisionComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, AttackSock);
-	AttackCollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	/*AttackCollisionComp->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, AttackSock);*/
+	AttackCollisionComp->SetupAttachment(GetMesh(), AttackSock);
+	//AttackCollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AttackCollisionComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 	
 	//AttackCollisionComp->OnComponentHit.AddDynamic(this, &AZEROCharacter::OnHitAttack);
@@ -152,14 +155,68 @@ void AZEROCharacter::OnRep_PlayerState()
 void AZEROCharacter::HandleDeath()
 {
 	GetCharacterMovement()->MaxWalkSpeed = 0;
-	MyHUD->RemoveFromParent();
+	if (MyHUD)
+	{
+		if (IsLocallyControlled())
+		{
+			MyHUD->RemoveFromParent();
+		}
+	}
+	
+	AFirstPlayerController* MyPC = Cast<AFirstPlayerController>(GetController());
+	if (MyPC)
+	{
+		MyPC->RespawnStart();
+	}
 	Destroy();
+	
+	
+}
+
+void AZEROCharacter::HandleKill()
+{
 	AFirstGameMode* MyGameMode = Cast<AFirstGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (MyGameMode)
 	{
-		MyGameMode->CheckIfAllPlayersOfTeamIsDead(TeamID);
+		MyGameMode->AddAndCheckIfKillCountReachedLimit(TeamID);
+		UpdateKillCount(MyGameMode->TeamAKills, MyGameMode->TeamBKills);
+
+	}
+	AFirstPlayerState* MyPlayerState = Cast<AFirstPlayerState>(GetController()->PlayerState);
+	if (MyPlayerState)
+	{
+		MyPlayerState->Kills += 1;
+
+		
+		FString TheFloatStr = FString::SanitizeFloat(MyPlayerState->Kills);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, *TheFloatStr);
 	}
 }
+
+float AZEROCharacter::GetKillCount()
+{
+	AFirstGameMode* MyGameMode = Cast<AFirstGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (MyGameMode)
+	{
+		//MyGameMode->AddAndCheckIfKillCountReachedLimit(TeamID);
+		UpdateKillCount(MyGameMode->TeamAKills, MyGameMode->TeamBKills);
+
+	}
+	AFirstPlayerState* MyPlayerState = Cast<AFirstPlayerState>(GetController()->PlayerState);
+	if (MyPlayerState)
+	{
+		return MyPlayerState->Kills;
+	}
+	return 0.0;
+}
+
+void AZEROCharacter::UpdateKillCount(int AK, int BK)
+{
+	ATeamKillCount = AK;
+	BTeamKillCount = BK;
+}
+
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -338,14 +395,14 @@ void AZEROCharacter::BeginPlay()
 
 	if (HUDWidget)
 	{
-		if (HasAuthority())
+		/*if (HasAuthority())
 		{
 			MyHUD = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), HUDWidget);
 			if (MyHUD)
 			{
 				MyHUD->AddToViewport();
 			}
-		}
+		}*/
 		if (IsLocallyControlled())
 		{
 			

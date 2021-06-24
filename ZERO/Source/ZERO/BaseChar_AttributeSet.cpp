@@ -41,20 +41,22 @@ void UBaseChar_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModC
 			
 			// Apply the Health change and then clamp it.
 			const float NewHealth = GetCurrentHealth() - LocalDamageDone;
-			FString TheFloatStr = FString::SanitizeFloat(NewHealth);
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, *TheFloatStr);
+			//FString TheFloatStr = FString::SanitizeFloat(NewHealth);
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, *TheFloatStr);
 			SetCurrentHealth(FMath::Clamp(NewHealth, 0.0f, GetMaximumHealth()));
-			 TheFloatStr = FString::SanitizeFloat(GetCurrentHealth());
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, *TheFloatStr);
+			// TheFloatStr = FString::SanitizeFloat(GetCurrentHealth());
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, *TheFloatStr);
 			if (GetCurrentHealth() <= 0)
 			{
 				AZEROCharacter* AvatarCharacter = Cast<AZEROCharacter>(Data.Target.GetAvatarActor());
-
-				if (AvatarCharacter)
+				FGameplayEffectContextHandle Context = Data.EffectSpec.GetContext();
+				AZEROCharacter* SourceCharacter = Cast<AZEROCharacter>(Context.GetInstigator());
+				if (AvatarCharacter && SourceCharacter)
 				{
 					// Empty function from Character Base that logic can be added to.
+					SourceCharacter->HandleKill();
 					AvatarCharacter->HandleDeath();
-					GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "Dead");
+					//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "Dead");
 				}
 			}
 		}

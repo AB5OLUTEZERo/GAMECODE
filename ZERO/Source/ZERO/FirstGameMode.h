@@ -30,21 +30,27 @@ public:
 		void RequestCharacterSpawn(TSubclassOf<AZEROCharacter> PlayerClass, ETeamID TeamID, AFirstPlayerController* ControllerRef);
 
 	TArray<class  AFirstPlayerController *> TeamAPlayers;
+
 	
+	int TeamAKills;
 
 	TArray<class  AFirstPlayerController *> TeamBPlayers;
-
+	int TeamBKills;
 
 	UFUNCTION()
 		void AddPlayerToTeamList(ETeamID TeamID, AFirstPlayerController* ControllerRef);
 
 	UFUNCTION()
-		void CheckIfAllPlayersOfTeamIsDead(ETeamID TeamID);
+		void AddAndCheckIfKillCountReachedLimit(ETeamID TeamID);
+
+	UFUNCTION(BlueprintCallable, Category = "KDA")
+		int GetTeamKillCount(ETeamID TeamID);
 	
 protected:
 	// Called when the game starts or when spawned
 	virtual void StartPlay() override;
 
-
+	UFUNCTION()
+		void TheEndGame(ETeamID TeamID);
 	
 };

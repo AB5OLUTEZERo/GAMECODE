@@ -31,12 +31,16 @@ public:
 
 	ETeamID TID;
 
+	TSubclassOf<AZEROCharacter> PCPlayerClass;
+
 
 	UFUNCTION()
-		void SetTheTPPController();
+		void RespawnStart();
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 		TSubclassOf<UUserWidget> CharSelectWidget;
+
+	
 	
 protected:
 	// Called when the game starts or when spawned
@@ -46,7 +50,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 		TSubclassOf<UUserWidget> MenuWidget;
 
-	
+
+	UFUNCTION()
+		void Respawn();
 
 
 	

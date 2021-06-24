@@ -8,6 +8,7 @@
 #include "Blueprint/UserWidget.h"
 #include"FirstGameMode.h"
 #include"FirstGameInstance.h"
+#include"TimerManager.h"
 
 
 AFirstPlayerController::AFirstPlayerController()
@@ -25,16 +26,31 @@ void AFirstPlayerController::CharacterSelected_Implementation(TSubclassOf<AZEROC
 	AFirstGameMode* MyGameMode = Cast<AFirstGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (MyGameMode)
 	{
-		
-			MyGameMode->RequestCharacterSpawn(PlayerClass, TID, this);
+		PCPlayerClass = PlayerClass;
+		MyGameMode->RequestCharacterSpawn(PlayerClass, TID, this);
 		
 	}
 
 }
-void AFirstPlayerController::SetTheTPPController()
+
+
+void AFirstPlayerController::Respawn()
 {
-	
+	AFirstGameMode* MyGameMode = Cast<AFirstGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (MyGameMode)
+	{
+		
+		MyGameMode->RequestCharacterSpawn(PCPlayerClass, TID, this);
+
+	}
 }
+
+void AFirstPlayerController::RespawnStart()
+{
+	FTimerHandle RespawnTimer;
+	GetWorldTimerManager().SetTimer(RespawnTimer, this, &AFirstPlayerController::Respawn, 3.0f, false, 3.0);
+}
+
 void AFirstPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -69,7 +85,7 @@ void AFirstPlayerController::BeginPlay()
 				////SetInputMode(InputModeData);
 			
 				//// Step 4 enable cursor so you know what to click on:
-				//bShowMouseCursor = true;
+				bShowMouseCursor = true;
 			}
 		}
 	}

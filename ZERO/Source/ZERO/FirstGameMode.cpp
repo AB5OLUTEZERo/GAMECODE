@@ -59,12 +59,12 @@ void AFirstGameMode::AddPlayerToTeamList(ETeamID TeamID, AFirstPlayerController 
 	if (TeamID == ETeamID::TeamA)
 	{
 		TeamAPlayers.AddUnique(ControllerRef);
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "A");
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "A");
 	}
 	else if (TeamID == ETeamID::TeamB)
 	{
 		TeamBPlayers.AddUnique(ControllerRef);
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "B");
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "B");
 	}
 	else
 	{
@@ -72,42 +72,56 @@ void AFirstGameMode::AddPlayerToTeamList(ETeamID TeamID, AFirstPlayerController 
 	}
 }
 
-void AFirstGameMode::CheckIfAllPlayersOfTeamIsDead(ETeamID TeamID)
+void AFirstGameMode::AddAndCheckIfKillCountReachedLimit(ETeamID TeamID)
 {
 	if (TeamID == ETeamID::TeamA)
 	{
-		for (int i = 0; i < TeamAPlayers.Num(); i++)
+		TeamAKills += 1;
+		if (TeamAKills >= 3)
 		{
-			AZEROCharacter* Char = Cast<AZEROCharacter>(TeamAPlayers[i]->GetPawn());
-			if (Char)
-			{
-				return;
-			}
+			
+			TheEndGame(TeamID);
 		}
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "Team B Wins");
 	}
 	else if (TeamID == ETeamID::TeamB)
 	{
-		for (int i = 0; i < TeamBPlayers.Num(); i++)
+		TeamBKills += 1;
+		if (TeamBKills >= 3)
 		{
-			AZEROCharacter* Char = Cast<AZEROCharacter>(TeamBPlayers[i]->GetPawn());
-			if (Char)
-			{
-				return;
-			}
+			TheEndGame(TeamID);
 		}
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "Team A Wins");
 	}
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "Error");
 	}
 }
+
+int AFirstGameMode::GetTeamKillCount(ETeamID TeamID)
+{
+	if (TeamID == ETeamID::TeamA)
+	{
+		return TeamAKills;
+	}
+	else if (TeamID == ETeamID::TeamB)
+	{
+		return TeamBKills;
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "Error");
+		return 0;
+	}
+}
+
+
 
 void AFirstGameMode::StartPlay()
 {
 	
 	Super::StartPlay();
+	TeamAKills = 0;
+	TeamBKills = 0;
 	UFirstGameInstance* MyGameInstance = Cast<UFirstGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
 	if (MyGameInstance)
 	{
@@ -125,4 +139,20 @@ void AFirstGameMode::StartPlay()
 		}
 	}
 	
+}
+
+void AFirstGameMode::TheEndGame(ETeamID TeamID)
+{
+	if (TeamID == ETeamID::None)
+	{
+
+	}
+	else if (TeamID == ETeamID::TeamA)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "TeamA Won");
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "TeamB Won");
+	}
 }
