@@ -29,13 +29,22 @@ public:
 	UFUNCTION()
 		void RequestCharacterSpawn(TSubclassOf<AZEROCharacter> PlayerClass, ETeamID TeamID, AFirstPlayerController* ControllerRef);
 
-	TArray<class  AFirstPlayerController *> TeamAPlayers;
-
 	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		FVector TeamAStartLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		FVector TeamBStartLocation;
+
+	TArray<class  AFirstPlayerController *> TeamAPlayers;
 	int TeamAKills;
 
 	TArray<class  AFirstPlayerController *> TeamBPlayers;
 	int TeamBKills;
+
+
+
 
 	UFUNCTION()
 		void AddPlayerToTeamList(ETeamID TeamID, AFirstPlayerController* ControllerRef);

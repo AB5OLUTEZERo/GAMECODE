@@ -12,6 +12,9 @@ AFirstGameState::AFirstGameState()
 void AFirstGameState::BeginPlay()
 {
 	Super::BeginPlay();
+	TeamAKills=0;
+
+	 TeamBKills=0;
 }
 
 void AFirstGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

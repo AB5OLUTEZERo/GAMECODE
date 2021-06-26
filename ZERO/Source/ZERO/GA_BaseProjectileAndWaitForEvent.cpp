@@ -206,13 +206,13 @@ void UGA_BaseProjectileAndWaitForEvent::HitEventReceived(FGameplayEventData Even
 	
 		if (Villan && GetCurrentActivationInfo().ActivationMode == EGameplayAbilityActivationMode::Authority)
 		{
-			FGameplayCueParameters ImpactParams;
+			/*FGameplayCueParameters ImpactParams;
 			ImpactParams.Location = Villan->GetActorLocation();
 
 			FGameplayTag TagImpact = FGameplayTag::RequestGameplayTag(FName(GCTagForImpact));
 
 			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "Effect");
-			Villan->GetAbilitySystemComponent()->AddGameplayCue(TagImpact, ImpactParams);
+			Villan->GetAbilitySystemComponent()->AddGameplayCue(TagImpact, ImpactParams);*/
 			if (Hero->TeamID != Villan->TeamID)
 			{
 				ApplyGameplayEffectToTarget(GetCurrentAbilitySpecHandle(), CurrentActorInfo, CurrentActivationInfo, EventData.TargetData, DamageGameplayEffect, 1);

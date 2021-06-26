@@ -8,6 +8,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Abilities/GameplayAbilityTargetActor.h"
 #include"ZEROCharacter.h"
+#include"BaseChar_AbilitySystemComponent.h"
 // Sets default values
 AGAS_HitActor::AGAS_HitActor()
 {
@@ -59,11 +60,19 @@ void AGAS_HitActor::FireInDirection(const FVector & ShootDirection)
 
 void AGAS_HitActor::OnHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComponent, FVector NormalImpulse, const FHitResult & Hit)
 {
+	AZEROCharacter* Hero = Cast<AZEROCharacter>(GetOwner());
+	FGameplayCueParameters ImpactParams;
+	ImpactParams.Location = Hit.Location;
+
+	FGameplayTag TagImpact = FGameplayTag::RequestGameplayTag(FName(GCTagForImpact));
+
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "Effect");
+	Hero->GetAbilitySystemComponent()->AddGameplayCue(TagImpact, ImpactParams);
 	if (OtherActor != this && OtherActor != GetOwner())
 	{
 
 		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, "REP.Hit");
-		AZEROCharacter* Hero = Cast<AZEROCharacter>(GetOwner());
+		
 		AZEROCharacter* Villan = Cast<AZEROCharacter>(OtherActor);
 		if (Villan)
 		{

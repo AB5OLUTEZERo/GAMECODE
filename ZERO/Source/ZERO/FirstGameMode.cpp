@@ -7,6 +7,7 @@
 #include "ZEROCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include"FirstGameInstance.h"
+#include"FirstGameStateBase.h"
 
 AFirstGameMode::AFirstGameMode()
 	
@@ -31,12 +32,13 @@ void AFirstGameMode::RequestCharacterSpawn(TSubclassOf<AZEROCharacter> PlayerCla
 		FTransform SpawnTransform;
 		if (TeamID == ETeamID::TeamA)
 		{
-			
-			SpawnTransform.SetLocation(FVector(-912.002502, 924.000000, 222.001526));
+			TeamAPlayers.AddUnique(ControllerRef);
+			SpawnTransform.SetLocation(TeamAStartLocation);
 		}
 		else if (TeamID == ETeamID::TeamB)
 		{
-			SpawnTransform.SetLocation(FVector(-912.002502, -1301.000000, 222.001526));
+			TeamBPlayers.AddUnique(ControllerRef);
+			SpawnTransform.SetLocation(TeamBStartLocation);
 			
 		}
 		else
@@ -74,26 +76,32 @@ void AFirstGameMode::AddPlayerToTeamList(ETeamID TeamID, AFirstPlayerController 
 
 void AFirstGameMode::AddAndCheckIfKillCountReachedLimit(ETeamID TeamID)
 {
-	if (TeamID == ETeamID::TeamA)
+	AFirstGameStateBase* MyGameState = Cast<AFirstGameStateBase>(GameState);
+	if (MyGameState)
 	{
-		TeamAKills += 1;
-		if (TeamAKills >= 3)
+		if (TeamID == ETeamID::TeamA)
 		{
-			
-			TheEndGame(TeamID);
+			TeamAKills += 1;
+			MyGameState->TeamAKills += 1;
+			if (TeamAKills >= 3)
+			{
+
+				TheEndGame(TeamID);
+			}
 		}
-	}
-	else if (TeamID == ETeamID::TeamB)
-	{
-		TeamBKills += 1;
-		if (TeamBKills >= 3)
+		else if (TeamID == ETeamID::TeamB)
 		{
-			TheEndGame(TeamID);
+			TeamBKills += 1;
+			MyGameState->TeamBKills += 1;
+			if (TeamBKills >= 3)
+			{
+				TheEndGame(TeamID);
+			}
 		}
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "Error");
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Black, "Error");
+		}
 	}
 }
 
@@ -143,16 +151,24 @@ void AFirstGameMode::StartPlay()
 
 void AFirstGameMode::TheEndGame(ETeamID TeamID)
 {
-	if (TeamID == ETeamID::None)
+	AFirstGameStateBase* MyGameState = Cast<AFirstGameStateBase>(GameState);
+	if (MyGameState)
 	{
-
+		if (TeamID == ETeamID::None)
+		{
+			MyGameState->WinResult = "No Winner";
+		}
+		else if (TeamID == ETeamID::TeamA)
+		{
+			MyGameState->WinResult = "Team A Wins";
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "TeamA Won");
+		}
+		else
+		{
+			MyGameState->WinResult = "Team B Wins";
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "TeamB Won");
+		}
 	}
-	else if (TeamID == ETeamID::TeamA)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "TeamA Won");
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "TeamB Won");
-	}
+	
+	
 }

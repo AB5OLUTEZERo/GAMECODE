@@ -29,13 +29,16 @@ public:
 		void CharacterSelected(TSubclassOf<AZEROCharacter> PlayerClass);
 
 
+	
 	ETeamID TID;
 
 	TSubclassOf<AZEROCharacter> PCPlayerClass;
 
-
+	FTimerHandle RespawnTimer;
 	UFUNCTION()
 		void RespawnStart();
+
+	
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 		TSubclassOf<UUserWidget> CharSelectWidget;

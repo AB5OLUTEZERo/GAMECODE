@@ -36,6 +36,9 @@ public:
 
 	void HomingTargetSet(class AZEROCharacter* Target, float HomingAccuracy);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+		FString GCTagForImpact;
+
 
 protected:
 	// Called when the game starts or when spawned

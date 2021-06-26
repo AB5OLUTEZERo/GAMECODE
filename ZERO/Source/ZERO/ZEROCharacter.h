@@ -63,6 +63,9 @@ public:
 		void HandleDeath();
 
 	UFUNCTION()
+		void HandleGameOver();
+
+	UFUNCTION()
 		void HandleKill();
 
 	UFUNCTION(BlueprintCallable, Category = "KDA")

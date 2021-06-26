@@ -23,6 +23,10 @@ public:
 	UPROPERTY(replicated)
 	TArray<AZEROCharacter*> Players;
 
+	int TeamAKills;
+
+	int TeamBKills;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

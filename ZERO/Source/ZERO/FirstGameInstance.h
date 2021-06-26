@@ -27,4 +27,8 @@ public:
 		ETeamID TeamID;
 
 		TSubclassOf<AZEROCharacter> PlayerClass;
+
+		int TeamAKills;
+
+		int TeamBKills;
 };

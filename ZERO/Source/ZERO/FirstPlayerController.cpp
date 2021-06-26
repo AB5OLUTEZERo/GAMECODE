@@ -21,7 +21,12 @@ void AFirstPlayerController::TeamSelected_Implementation(ETeamID TeamID)
 }
 void AFirstPlayerController::CharacterSelected_Implementation(TSubclassOf<AZEROCharacter> PlayerClass)
 {
-
+	
+	/*FInputModeGameAndUI InputMode;
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
+	InputMode.SetHideCursorDuringCapture(false);
+	SetInputMode(InputMode);
+	bShowMouseCursor = false;*/
 	bShowMouseCursor = false;
 	AFirstGameMode* MyGameMode = Cast<AFirstGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (MyGameMode)
@@ -45,11 +50,17 @@ void AFirstPlayerController::Respawn()
 	}
 }
 
+
+
 void AFirstPlayerController::RespawnStart()
 {
-	FTimerHandle RespawnTimer;
+	
 	GetWorldTimerManager().SetTimer(RespawnTimer, this, &AFirstPlayerController::Respawn, 3.0f, false, 3.0);
 }
+
+
+
+
 
 void AFirstPlayerController::BeginPlay()
 {
@@ -69,6 +80,7 @@ void AFirstPlayerController::BeginPlay()
 	}
 	if (MenuWidget)
 	{
+		//bShowMouseCursor = true;
 		if(IsLocalController())
 		{
 			UUserWidget* MyMenu = CreateWidget<UUserWidget>(this, MenuWidget);
@@ -85,7 +97,7 @@ void AFirstPlayerController::BeginPlay()
 				////SetInputMode(InputModeData);
 			
 				//// Step 4 enable cursor so you know what to click on:
-				bShowMouseCursor = true;
+				//bShowMouseCursor = true;
 			}
 		}
 	}

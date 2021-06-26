@@ -157,10 +157,9 @@ void AZEROCharacter::HandleDeath()
 	GetCharacterMovement()->MaxWalkSpeed = 0;
 	if (MyHUD)
 	{
-		if (IsLocallyControlled())
-		{
+		
 			MyHUD->RemoveFromParent();
-		}
+		
 	}
 	
 	AFirstPlayerController* MyPC = Cast<AFirstPlayerController>(GetController());
@@ -168,9 +167,26 @@ void AZEROCharacter::HandleDeath()
 	{
 		MyPC->RespawnStart();
 	}
+	AbilitySystemComp->CancelAllAbilities();
+
+	Destroy();  
+	
+	
+}
+
+void AZEROCharacter::HandleGameOver()
+{
+	GetCharacterMovement()->MaxWalkSpeed = 0;
+	if (MyHUD)
+	{
+
+		MyHUD->RemoveFromParent();
+
+	}
+	AbilitySystemComp->CancelAllAbilities();
+
 	Destroy();
-	
-	
+
 }
 
 void AZEROCharacter::HandleKill()
@@ -395,14 +411,14 @@ void AZEROCharacter::BeginPlay()
 
 	if (HUDWidget)
 	{
-		/*if (HasAuthority())
+		if (HasAuthority())
 		{
 			MyHUD = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), HUDWidget);
 			if (MyHUD)
 			{
 				MyHUD->AddToViewport();
 			}
-		}*/
+		}
 		if (IsLocallyControlled())
 		{
 			
