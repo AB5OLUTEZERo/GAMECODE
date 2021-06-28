@@ -44,6 +44,8 @@ public:
 	int TeamBKills;
 
 
+	TArray<class  AFirstPlayerController *> AllPlayers;
+
 
 
 	UFUNCTION()
@@ -58,6 +60,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void StartPlay() override;
+
+	virtual void PostLogin(APlayerController* NewPlayer)override;
 
 	UFUNCTION()
 		void TheEndGame(ETeamID TeamID);

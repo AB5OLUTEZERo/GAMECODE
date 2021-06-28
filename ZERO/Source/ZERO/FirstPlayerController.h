@@ -32,13 +32,16 @@ public:
 	
 	ETeamID TID;
 
+	FString WinResult;
+
 	TSubclassOf<AZEROCharacter> PCPlayerClass;
 
 	FTimerHandle RespawnTimer;
 	UFUNCTION()
 		void RespawnStart();
 
-	
+	UFUNCTION(Client, Reliable)
+		void GameEnded();
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 		TSubclassOf<UUserWidget> CharSelectWidget;
@@ -52,6 +55,10 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 		TSubclassOf<UUserWidget> MenuWidget;
+
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+		TSubclassOf<UUserWidget> GameOverWidget;
 
 
 	UFUNCTION()

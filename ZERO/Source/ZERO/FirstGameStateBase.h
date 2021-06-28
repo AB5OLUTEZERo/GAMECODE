@@ -23,14 +23,20 @@ public:
 	UPROPERTY(replicated)
 		TArray<AZEROCharacter*> Players;
 
-	UPROPERTY(replicated, BlueprintReadOnly, Category = "Combo")
+	UPROPERTY(replicated, BlueprintReadOnly, Category = "GameState")
 	int TeamAKills;
 
-	UPROPERTY(replicated, BlueprintReadOnly, Category = "Combo")
+	UPROPERTY(replicated, BlueprintReadOnly, Category = "GameState")
 	int TeamBKills;
 
-	UPROPERTY(replicated, BlueprintReadOnly, Category = "Combo")
+	UPROPERTY(replicated, BlueprintReadOnly, Category = "GameState")
 		FString WinResult;
+
+	UPROPERTY(replicated, BlueprintReadOnly, Category = "GameState")
+	bool bGameEnded;
+
+	UFUNCTION(NetMulticast, Reliable)
+		void EndGame();
 protected:
 	
 	// Called when the game starts or when spawned

@@ -9,6 +9,8 @@
 #include"FirstGameMode.h"
 #include"FirstGameInstance.h"
 #include"TimerManager.h"
+#include"DrawDebugHelpers.h"
+#include"FirstGameStateBase.h"
 
 
 AFirstPlayerController::AFirstPlayerController()
@@ -41,11 +43,19 @@ void AFirstPlayerController::CharacterSelected_Implementation(TSubclassOf<AZEROC
 
 void AFirstPlayerController::Respawn()
 {
-	AFirstGameMode* MyGameMode = Cast<AFirstGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (MyGameMode)
+	AFirstGameStateBase* MyGameState = Cast<AFirstGameStateBase>(UGameplayStatics::GetGameState(GetWorld()));
+	if (MyGameState )
 	{
-		
-		MyGameMode->RequestCharacterSpawn(PCPlayerClass, TID, this);
+		if (MyGameState->bGameEnded == false)
+		{
+			AFirstGameMode* MyGameMode = Cast<AFirstGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+			if (MyGameMode)
+			{
+
+				MyGameMode->RequestCharacterSpawn(PCPlayerClass, TID, this);
+
+			}
+		}
 
 	}
 }
@@ -58,6 +68,32 @@ void AFirstPlayerController::RespawnStart()
 	GetWorldTimerManager().SetTimer(RespawnTimer, this, &AFirstPlayerController::Respawn, 3.0f, false, 3.0);
 }
 
+void AFirstPlayerController::GameEnded_Implementation()
+{
+	
+	//WinResult = Result;
+	if (GameOverWidget)
+	{
+		//bShowMouseCursor = true;
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "Won");
+			UUserWidget* MyGameOver = CreateWidget<UUserWidget>(this, GameOverWidget);
+			if (MyGameOver)
+			{
+				
+				MyGameOver->AddToViewport();
+
+			}
+			if (GetPawn())
+			{
+				GetPawn()->DisableInput(this);
+			}
+			
+
+	}
+}
+
+
+
 
 
 
@@ -65,6 +101,7 @@ void AFirstPlayerController::RespawnStart()
 void AFirstPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	if (HasAuthority())
 	{
 		TArray<AActor*> _TempArryActors;

@@ -9,6 +9,7 @@
 #include"FirstGameInstance.h"
 #include"FirstGameStateBase.h"
 
+
 AFirstGameMode::AFirstGameMode()
 	
 {
@@ -83,7 +84,7 @@ void AFirstGameMode::AddAndCheckIfKillCountReachedLimit(ETeamID TeamID)
 		{
 			TeamAKills += 1;
 			MyGameState->TeamAKills += 1;
-			if (TeamAKills >= 3)
+			if (TeamAKills >= 1)
 			{
 
 				TheEndGame(TeamID);
@@ -93,7 +94,7 @@ void AFirstGameMode::AddAndCheckIfKillCountReachedLimit(ETeamID TeamID)
 		{
 			TeamBKills += 1;
 			MyGameState->TeamBKills += 1;
-			if (TeamBKills >= 3)
+			if (TeamBKills >= 1)
 			{
 				TheEndGame(TeamID);
 			}
@@ -149,26 +150,44 @@ void AFirstGameMode::StartPlay()
 	
 }
 
+void AFirstGameMode::PostLogin(APlayerController * NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+	AFirstPlayerController* PCRef = Cast<AFirstPlayerController>(NewPlayer);
+	if (PCRef)
+	{
+		AllPlayers.Add(PCRef);
+	}
+}
+
 void AFirstGameMode::TheEndGame(ETeamID TeamID)
 {
+	FString Result;
 	AFirstGameStateBase* MyGameState = Cast<AFirstGameStateBase>(GameState);
 	if (MyGameState)
 	{
+		MyGameState->bGameEnded = true;
 		if (TeamID == ETeamID::None)
 		{
-			MyGameState->WinResult = "No Winner";
+			//MyGameState->WinResult = "No Winner";
 		}
 		else if (TeamID == ETeamID::TeamA)
 		{
 			MyGameState->WinResult = "Team A Wins";
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "TeamA Won");
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, "TeamA Won");
 		}
 		else
 		{
 			MyGameState->WinResult = "Team B Wins";
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "TeamB Won");
+			////GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "TeamB Won");
 		}
+		
 	}
+	for (int i = 0; i < AllPlayers.Num(); i++)
+	{
+		AllPlayers[i]->GameEnded();
+	}
+
 	
 	
 }
