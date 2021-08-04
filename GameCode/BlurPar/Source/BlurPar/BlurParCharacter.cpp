@@ -10,6 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "MyCharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include"RacePlayerController.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ABlurParCharacter
@@ -84,6 +85,16 @@ void ABlurParCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerI
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ABlurParCharacter::SprintEnd);
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ABlurParCharacter::Dash);
 	
+}
+
+ARacePlayerController * ABlurParCharacter::GetPlayerController()
+{
+	ARacePlayerController* PC = Cast<ARacePlayerController>(GetController());
+	if (PC)
+	{
+		return PC;
+	}
+	return nullptr;
 }
 
 

@@ -23,6 +23,17 @@ public:
 	UFUNCTION(Reliable, Client)
 		void UnfreezePlayer();
 
+
+	UFUNCTION(Reliable, Client)
+		void PlayerFinished(int place);
+
+
+	UPROPERTY(BlueprintReadOnly)
+	int PlacedAt;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+		TSubclassOf<UUserWidget> FinishedWidget;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 		TSubclassOf<UUserWidget> CountDownWidget;
 

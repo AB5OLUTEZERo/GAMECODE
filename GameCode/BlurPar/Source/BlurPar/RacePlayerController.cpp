@@ -27,6 +27,27 @@ void ARacePlayerController::DisplayCountDownWidget_Implementation()
 void ARacePlayerController::UnfreezePlayer_Implementation()
 {
 	GetPawn()->EnableInput(this);
+	
+}
+
+
+
+void ARacePlayerController::PlayerFinished_Implementation(int place)
+{
+	GetPawn()->DisableInput(this);
+	PlacedAt = place;
+	if (FinishedWidget)
+	{
+		UUserWidget* MyFinished = CreateWidget<UUserWidget>(this, FinishedWidget);
+		if (MyFinished)
+		{
+
+			MyFinished->AddToViewport();
+
+		}
+
+	}
+
 }
 
 void ARacePlayerController::SetupInputComponent()

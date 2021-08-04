@@ -21,6 +21,9 @@ public:
 
 	void StartCountDownForAllPlayers();
 
+
+	void PlayerReacherFinishLine(class  ARacePlayerController* ReachedPC);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void StartPlay() override;
@@ -29,11 +32,15 @@ protected:
 
 	TArray<class  ARacePlayerController*> AllPlayers;
 
+	TArray<class  ARacePlayerController*> FinishList;
+
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TSubclassOf<class  ABlurParCharacter> PlayerClass;
 
 	bool RaceStarted;
 
 	void UnfreezeAllPlayers();
+
+
 
 };

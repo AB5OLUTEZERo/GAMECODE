@@ -69,3 +69,24 @@ void ARaceGameMode::StartCountDownForAllPlayers()
 	}
 
 }
+
+void ARaceGameMode::PlayerReacherFinishLine(ARacePlayerController * ReachedPC)
+{
+	if (FinishList.Num() > 0)
+	{
+		for (int i = 0; i < FinishList.Num(); i++)
+		{
+			if (FinishList[i] == ReachedPC)
+			{
+				return;
+			}
+
+		}
+		FinishList.Add(ReachedPC);
+	}
+	else
+	{
+		FinishList.Add(ReachedPC);
+	}
+	ReachedPC->PlayerFinished(FinishList.Num());
+}
