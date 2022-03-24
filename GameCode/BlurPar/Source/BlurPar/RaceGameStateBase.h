@@ -13,5 +13,10 @@ UCLASS()
 class BLURPAR_API ARaceGameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
+
+
+public:
+	virtual float GetServerWorldTimeSeconds() const override;
+
 	
 };

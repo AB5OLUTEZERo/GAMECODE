@@ -10,6 +10,13 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "MyCharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include<GameplayEffectTypes.h>
+#include"MyAbilitySystemComponent.h"
+#include"MyAttributeSet.h"
+#include"BaseGameplayAbility.h"
+#include "Net/UnrealNetwork.h"
+#include "Components/BoxComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include"RacePlayerController.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -47,8 +54,84 @@ ABlurParCharacter::ABlurParCharacter(const class FObjectInitializer& ObjectIniti
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+
+	//GAS Components
+	AbilitySystemComp = CreateDefaultSubobject<UMyAbilitySystemComponent>(TEXT("AbilitySystemComp"));
+	AbilitySystemComp->SetIsReplicated(true);
+	AbilitySystemComp->SetReplicationMode(EGameplayEffectReplicationMode::Full);
+
+	AttributeSet = CreateDefaultSubobject<UMyAttributeSet>(TEXT("AttributeSet"));
+
+
+	//AbilitySystemComp->RegisterGameplayTagEvent(FGameplayTag::RequestGameplayTag(FName("Player.Debuff.Stun")), EGameplayTagEventType::NewOrRemoved).AddUObject(this, &ABlurParCharacter::StunTagChanged);
+
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+}
+
+UAbilitySystemComponent * ABlurParCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComp;
+}
+
+void ABlurParCharacter::InitializeAttributes()
+{
+	if (AbilitySystemComp && DefaultGameplayEffect)
+	{
+		FGameplayEffectContextHandle EffectContext = AbilitySystemComp->MakeEffectContext();
+		EffectContext.AddSourceObject(this);
+
+
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComp->MakeOutgoingSpec(DefaultGameplayEffect, 1, EffectContext);
+
+		if (SpecHandle.IsValid())
+		{
+			FActiveGameplayEffectHandle GEHandle = AbilitySystemComp->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+	}
+}
+
+void ABlurParCharacter::GiveAbilities()
+{
+	if (HasAuthority() && AbilitySystemComp)
+	{
+		for (TSubclassOf<UBaseGameplayAbility>& StartupAbility : DefaultAbilities)
+		{
+
+			AbilitySystemComp->GiveAbility(FGameplayAbilitySpec(StartupAbility, 1, static_cast<int32>(StartupAbility.GetDefaultObject()->AbilityInputID), this));
+
+
+		}
+	}
+}
+
+void ABlurParCharacter::PossessedBy(AController * NewController)
+{
+	Super::PossessedBy(NewController);
+
+	//server GAS 
+	AbilitySystemComp->InitAbilityActorInfo(this, this);
+
+	InitializeAttributes();
+	GiveAbilities();
+}
+
+void ABlurParCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	//Client GAS
+	AbilitySystemComp->InitAbilityActorInfo(this, this);
+
+	InitializeAttributes();
+
+	if (AbilitySystemComp && InputComponent)
+	{
+		const FGameplayAbilityInputBinds Binds("Confirm", "Cancel", "EGASAbilityInputID", static_cast<int32>(EGASAbilityInputID::Confirm), static_cast<int32>(EGASAbilityInputID::Cancel));
+
+		AbilitySystemComp->BindAbilityActivationToInputComponent(InputComponent, Binds);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -84,6 +167,14 @@ void ABlurParCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerI
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ABlurParCharacter::SprintStart);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ABlurParCharacter::SprintEnd);
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ABlurParCharacter::Dash);
+
+
+	if (AbilitySystemComp && InputComponent)
+	{
+		const FGameplayAbilityInputBinds Binds("Confirm", "Cancel", "EGASAbilityInputID", static_cast<int32>(EGASAbilityInputID::Confirm), static_cast<int32>(EGASAbilityInputID::Cancel));
+
+		AbilitySystemComp->BindAbilityActivationToInputComponent(InputComponent, Binds);
+	}
 	
 }
 
@@ -128,12 +219,26 @@ void ABlurParCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Loca
 
 void ABlurParCharacter::SprintStart()
 {
-	GetMyMovementComponent()->SetSprinting(true);
+	if (bIsProjectActivated)
+	{
+		GetMyMovementComponent()->SetSprinting(true);
+	}
+	else
+	{
+		GetMyMovementComponent()->MaxWalkSpeed = 1200;
+	}
 }
 
 void ABlurParCharacter::SprintEnd()
 {
-	GetMyMovementComponent()->SetSprinting(false);
+	if (bIsProjectActivated)
+	{
+		GetMyMovementComponent()->SetSprinting(false);
+	}
+	else
+	{
+		GetMyMovementComponent()->MaxWalkSpeed = 300;
+	}
 }
 
 void ABlurParCharacter::Dash()

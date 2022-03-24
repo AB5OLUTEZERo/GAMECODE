@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "AbilitySystemInterface.h"
+#include <GameplayEffectTypes.h>
+#include"BlurPar.h"
 #include "BlurParCharacter.generated.h"
 
 UCLASS(config=Game)
-class ABlurParCharacter : public ACharacter
+class ABlurParCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -18,6 +21,15 @@ class ABlurParCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+		class UMyAbilitySystemComponent* AbilitySystemComp;
+
+
+
+	UPROPERTY()
+		class UMyAttributeSet* AttributeSet;
 public:
 	ABlurParCharacter(const class FObjectInitializer& ObjectInitializer);
 
@@ -25,10 +37,33 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
+		bool bIsProjectActivated;
+
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+
+	virtual class UAbilitySystemComponent* GetAbilitySystemComponent()const override;
+
+	virtual void InitializeAttributes();
+	virtual void GiveAbilities();
+
+
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+
+
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GAS")
+		TSubclassOf<class UGameplayEffect> DefaultGameplayEffect;
+
+
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GAS")
+		TArray<TSubclassOf<class UBaseGameplayAbility>> DefaultAbilities;
 
 
 protected:

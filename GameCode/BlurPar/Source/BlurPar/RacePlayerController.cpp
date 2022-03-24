@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include"RaceGameMode.h"
+#include "Engine/World.h"
+#include"RaceGameStateBase.h"
 
 	
 
@@ -48,6 +50,49 @@ void ARacePlayerController::PlayerFinished_Implementation(int place)
 
 	}
 
+}
+
+void ARacePlayerController::ServerRequestServerTime_Implementation(
+	APlayerController* requester,
+	float requestWorldTime
+)
+{
+	float serverTime = GetWorld()->GetGameState()->GetServerWorldTimeSeconds();
+
+	ClientReportServerTime(requestWorldTime, serverTime);
+}
+
+bool ARacePlayerController::ServerRequestServerTime_Validate(
+	APlayerController* requester,
+	float requestWorldTime
+)
+{
+	return true;
+}
+
+void ARacePlayerController::ClientReportServerTime_Implementation(
+	float requestWorldTime,
+	float serverTime
+)
+{
+	// Apply the round-trip request time to the server's         
+	// reported time to get the up-to-date server time
+	float roundTripTime = GetWorld()->GetTimeSeconds() -
+		requestWorldTime;
+	float adjustedTime = serverTime + (roundTripTime * 0.5f);
+	ServerTime = adjustedTime;
+}
+void ARacePlayerController::ReceivedPlayer()
+{
+	Super::ReceivedPlayer();
+
+	if (IsLocalController())
+	{
+		ServerRequestServerTime(
+			this,
+			GetWorld()->GetTimeSeconds()
+		);
+	}
 }
 
 void ARacePlayerController::SetupInputComponent()
